@@ -1,4 +1,4 @@
-package com.bolt.consumer.demoapp;
+package com.reactbolt.sdk;
 
 import android.content.Context;
 import android.os.Handler;
