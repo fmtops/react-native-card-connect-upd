@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View, Button} from 'react-native';
 import CardConnect from 'react-native-card-connect';
 import moment from 'moment';
 
@@ -10,6 +10,7 @@ export default class App extends Component {
   };
   componentDidMount() {
     this.tokenizeCard()
+
   }
   async tokenizeCard() {
 
@@ -36,13 +37,27 @@ export default class App extends Component {
 
     }
   }
+
   render() {
+
+    const onPressDiscover = () => {
+
+      console.log('on press discover');
+      console.log(CardConnect);
+      CardConnect.discoverDevice();
+      console.log('after discoverDevice');
+    };
+
     return (
       <View style={styles.container}>
         <Text style={styles.welcome}>☆CardConnect example☆</Text>
         <Text style={styles.instructions}>STATUS: {this.state.status}</Text>
-        <Text style={styles.welcome}>☆NATIVE CALLBACK MESSAGE☆</Text>
+        <Text style={styles.welcome}>☆NATIVE CALLBACK test MESSAGE☆</Text>
         <Text style={styles.instructions}>{this.state.message}</Text>
+        <Button 
+          title='Discover'
+          onPress={onPressDiscover}
+        />
       </View>
     );
   }

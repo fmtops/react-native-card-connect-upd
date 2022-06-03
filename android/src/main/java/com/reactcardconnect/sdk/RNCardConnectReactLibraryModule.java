@@ -15,12 +15,12 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 
-public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
+public class RNCardConnectReactLibraryModule extends ReactContextBaseJavaModule {
 
     private static final String TAG = "CardConnect";
     private BluetoothSearchResponseListener mBluetoothSearchResponseListener = null;
 
-    public RNBoltReactLibraryModule(ReactApplicationContext reactContext) {
+    public RNCardConnectReactLibraryModule(ReactApplicationContext reactContext) {
         super(reactContext);
     }
 
