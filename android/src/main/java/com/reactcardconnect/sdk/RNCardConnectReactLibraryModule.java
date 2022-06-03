@@ -1,19 +1,24 @@
 package com.reactbolt.sdk;
 
+import android.bluetooth.BluetoothDevice;
+import android.util.Log;
 import com.bolt.consumersdk.CCConsumer;
 import com.bolt.consumersdk.CCConsumerTokenCallback;
 import com.bolt.consumersdk.domain.CCConsumerAccount;
 import com.bolt.consumersdk.domain.CCConsumerCardInfo;
 import com.bolt.consumersdk.domain.CCConsumerError;
 import com.bolt.consumersdk.utils.CCConsumerCardUtils;
+import com.bolt.consumersdk.listeners.BluetoothSearchResponseListener;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 
-
 public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
+
+    private static final String TAG = "CardConnect";
+    private BluetoothSearchResponseListener mBluetoothSearchResponseListener = null;
 
     public RNBoltReactLibraryModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -22,6 +27,39 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
     @Override
     public String getName() {
         return "BoltSDK";
+    }
+
+    @ReactMethod
+    public void discoverDevice() {
+
+        Log.v(TAG, "start of discoverDevice");
+
+        api.startBluetoothDeviceSearch(mBluetoothSearchResponseListener, MainActivity.this, false);
+
+        mBluetoothSearchResponseListener = new BluetoothSearchResponseListener() {
+            @Override
+            public void onDeviceFound(BluetoothDevice device) {
+                synchronized (mapDevices) {
+
+                    Log.v(TAG, "on device found");
+                    Log.v(TAG, device.getAddress());
+
+                    // mapDevices.put(device.getAddress(), device);
+
+                    // deviceListAdapter.clear();
+
+                    // for (BluetoothDevice dev : mapDevices.values()) {
+                    //     if (TextUtils.isEmpty(dev.getName())) {
+                    //         deviceListAdapter.add(dev.getAddress());
+                    //     } else {
+                    //         deviceListAdapter.add(dev.getName());
+                    //     }
+                    // }
+
+                    // deviceListAdapter.notifyDataSetChanged();
+                }
+            }
+        };
     }
 
     @ReactMethod
