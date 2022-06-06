@@ -297,11 +297,12 @@ public class SwiperControllerManager {
     private void setupConsumerApi() {
         switch (SwiperControllerManager.getInstance().getSwiperType()) {
             case BBPosDevice:
-                //CCConsumer.getInstance().getApi().setEndPoint("https://fts-uat.cardconnect.com");
-                CCConsumer.getInstance().getApi().setEndPoint(mContext.getString(R.string.cardconnect_prod_post_url));
+                CCConsumer.getInstance().getApi().setEndPoint("https://fts-uat.cardconnect.com");
+                // CCConsumer.getInstance().getApi().setEndPoint(mContext.getString(R.string.cardconnect_prod_post_url));
                 break;
             case IDTech:
-                CCConsumer.getInstance().getApi().setEndPoint(mContext.getString(R.string.cardconnect_prod_post_url));
+                CCConsumer.getInstance().getApi().setEndPoint("https://fts-uat.cardconnect.com");
+                // CCConsumer.getInstance().getApi().setEndPoint(mContext.getString(R.string.cardconnect_prod_post_url));
                 //CCConsumer.getInstance().getApi().setEndPoint(mContext.getString(R.string.cardconnect_qa_post_url));
                 break;
         }

@@ -16,6 +16,7 @@ export default class App extends Component {
 
     try {
 
+      console.log(CardConnect);
       const siteId = "fts";
       const cardNumber = "4111111111111111";
       const expiryDate = moment('12/22', 'MM/YY').toISOString();
