@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RNCardConnectReactLibraryModule extends ReactContextBaseJavaModule {
+public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
 
     private static final String TAG = "CardConnect";
     private BluetoothSearchResponseListener mBluetoothSearchResponseListener = null;
@@ -80,9 +80,6 @@ public class RNCardConnectReactLibraryModule extends ReactContextBaseJavaModule 
       String cvv,
       final Promise promise
     ) {
-        // String cardNumber = options.getString("cardNumber");
-        // String cvv = options.getString("cvv");
-        // String expiryDate = options.getString("expiryDate");
 
         try {
             validateCardNumber(cardNumber);
@@ -138,7 +135,6 @@ public class RNCardConnectReactLibraryModule extends ReactContextBaseJavaModule 
 
     @ReactMethod
     private void setupConsumerApiEndpoint(String url) {
-        CCConsumer.getInstance().getApi().setEndPoint( "https://" + url + "/cardsecure/cs");
-        CCConsumer.getInstance().getApi().setDebugEnabled(true);
+        CCConsumer.getInstance().getApi().setEndPoint(url);
     }
 }
