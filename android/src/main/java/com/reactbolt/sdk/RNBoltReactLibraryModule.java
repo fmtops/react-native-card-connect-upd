@@ -6,7 +6,6 @@ import com.bolt.consumersdk.domain.CCConsumerAccount;
 import com.bolt.consumersdk.domain.CCConsumerCardInfo;
 import com.bolt.consumersdk.domain.CCConsumerError;
 import com.bolt.consumersdk.utils.CCConsumerCardUtils;
-import com.bolt.consumersdk.utils.LogHelper;
 
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -14,13 +13,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 
-import android.util.Log;
-
-import com.google.gson.Gson;
-
 public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
-
-    private static final String TAG = "BoltSDK";
 
     public RNBoltReactLibraryModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -39,25 +32,18 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
       final Promise promise
     ) {
 
-        LogHelper.setEnable(true);
-        LogHelper.setLogLevel(LogHelper.LogLevel.DEBUG);
-
         try {
             validateCardNumber(cardNumber);
             validateCvv(cvv);
 
             CCConsumerCardInfo mCCConsumerCardInfo = new CCConsumerCardInfo();
             mCCConsumerCardInfo.setCardNumber(cardNumber);
-            mCCConsumerCardInfo.setExpirationDate("08/24");
+            mCCConsumerCardInfo.setExpirationDate(expiryDate);
             mCCConsumerCardInfo.setCvv(cvv);
-            mCCConsumerCardInfo.setPostalCode("04092");
-
-            // Log.v(TAG, new Gson().toJson(mCCConsumerCardInfo));
 
             CCConsumer.getInstance().getApi().generateAccountForCard(mCCConsumerCardInfo, new CCConsumerTokenCallback() {
                 @Override
                 public void onCCConsumerTokenResponseError(CCConsumerError ccConsumerError) {
-                    // Log.v(TAG, new Gson().toJson(ccConsumerError));
                     promise.reject(new Exception(ccConsumerError.getResponseMessage()));
                 }
 
@@ -100,14 +86,6 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     private void setupConsumerApiEndpoint(String url) {
-
-        // CCConsumer.getInstance().getApi().setEndPoint("https://qa.cardconnect.com");
-        // CCConsumer.getInstance().getApi().setEndPoint("https://fts.cardconnect.com:6443");
-
-        // CCConsumer.getInstance().getApi().setEndPoint("https://fts-uat.cardconnect.com");
-
         CCConsumer.getInstance().getApi().setEndPoint(url);
-
-        // CCConsumer.getInstance().getApi().setDebugEnabled(true);
     }
 }
