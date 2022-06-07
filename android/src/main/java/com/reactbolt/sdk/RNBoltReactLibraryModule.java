@@ -24,7 +24,7 @@ import java.util.Map;
 
 public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
 
-    private static final String TAG = "CardConnect";
+    private static final String TAG = "BoltSDK";
     private BluetoothSearchResponseListener mBluetoothSearchResponseListener = null;
     private Map<String, BluetoothDevice> mapDevices = Collections.synchronizedMap(new HashMap<String, BluetoothDevice>());
     ReactApplicationContext context;
@@ -36,7 +36,7 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
 
     @Override
     public String getName() {
-        return "CardConnect";
+        return "BoltSDK";
     }
 
     @ReactMethod

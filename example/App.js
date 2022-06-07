@@ -45,8 +45,8 @@ export default class App extends Component {
     const onPressDiscover = () => {
 
       console.log('on press discover');
-      console.log(CardConnect);
-      CardConnect.discoverDevice();
+      console.log(BoltSDK);
+      BoltSDK.discoverDevice();
       console.log('after discoverDevice');
     };
 
