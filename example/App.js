@@ -1,15 +1,18 @@
-import React, {Component} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
-import CardConnect from 'react-native-card-connect';
+import React, { Component } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import BoltSDK from 'react-native-card-connect';
 
 export default class App extends Component {
+
   state = {
     status: 'starting',
     message: '--'
   };
+
   componentDidMount() {
     this.tokenizeCard()
   }
+
   async tokenizeCard() {
 
     try {
@@ -19,9 +22,9 @@ export default class App extends Component {
       const expiryDate = '12/22';
       const cVc = "123";
 
-      CardConnect.setupConsumerApiEndpoint(`https://${siteId}.cardconnect.com`);
+      BoltSDK.setupConsumerApiEndpoint(`https://${siteId}.cardconnect.com`);
 
-      const token = await CardConnect.getCardToken(
+      const token = await BoltSDK.getCardToken(
         cardNumber,
         expiryDate,
         cVc

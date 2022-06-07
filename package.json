@@ -3,7 +3,7 @@
   "title": "React Native Card Connect",
   "description": "Boilerplate library. Tokenize Credit/Debit Card info using Cardconnect Native SDKs",
   "version": "1.0.0",
-  "main": "card_connect.js",
+  "main": "bolt_sdk.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/brij-dev/react-native-card-connect.git",

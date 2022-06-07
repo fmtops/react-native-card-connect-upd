@@ -18,17 +18,17 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
-public class RNCardConnectReactLibraryModule extends ReactContextBaseJavaModule {
+public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
 
-    private static final String TAG = "CardConnect";
+    private static final String TAG = "BoltSDK";
 
-    public RNCardConnectReactLibraryModule(ReactApplicationContext reactContext) {
+    public RNBoltReactLibraryModule(ReactApplicationContext reactContext) {
         super(reactContext);
     }
 
     @Override
     public String getName() {
-        return "CardConnect";
+        return "BoltSDK";
     }
 
     @ReactMethod
