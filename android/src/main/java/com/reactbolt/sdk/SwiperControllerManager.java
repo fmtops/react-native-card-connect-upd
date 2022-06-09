@@ -78,10 +78,12 @@ public class SwiperControllerManager {
      */
     public void connectToDevice() {
         if (mSwiperType == SwiperType.IDTech && TextUtils.isEmpty(mDeviceMACAddress)) {
+            Log.d(TAG, "Connect to device: mac address empty");
             return;
         }
 
         if (mContext == null || mDeviceMACAddress == null) {
+            Log.d(TAG, "Connect to device: mac address empty");
             return;
         }
 

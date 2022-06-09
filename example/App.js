@@ -1,42 +1,66 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import {
+  Button,
+  FlatList,
+  NativeEventEmitter,
+  NativeModules,
+  StyleSheet,
+  Text,
+  View
+} from 'react-native';
 import BoltSDK from 'react-native-card-connect';
+
+const SITE_ID = "fts-uat";
+const SITE_URL = `https://${SITE_ID}.cardconnect.com/cardconnect/rest`;
 
 export default class App extends Component {
 
   state = {
-    status: 'starting',
-    message: '--'
+    devices: {},
+    card: {
+      number: '4111111111111111',
+      expiryDate: '12/22',
+      cvv: '123'
+    }
   };
 
   componentDidMount() {
-    this.tokenizeCard()
 
+    BoltSDK.setupConsumerApiEndpoint(SITE_URL);
+
+    const eventEmitter = new NativeEventEmitter(NativeModules.BoltSDK);
+    this.eventListener = eventEmitter.addListener('DeviceFound', this.onDeviceFound);
+  }
+
+  // the Bolt SDK will return the same device multiplle times, so we'll keep all
+  // stored devices unique by storing them keyed on their macAddress
+  onDeviceFound = (device) => {
+
+    this.setState({
+      devices: {
+        ...this.state.devices,
+        [device.macAddress]: device
+      }
+    });
+  }
+
+  componentWillUnmount() {
+    this.eventListener.remove();
   }
 
   async tokenizeCard() {
 
     try {
-
-      const siteId = "fts-uat";
-      const cardNumber = "4111111111111111";
-      const expiryDate = '12/22';
-      const cVc = "123";
-
-      BoltSDK.setupConsumerApiEndpoint(`https://${siteId}.cardconnect.com`);
-
       const token = await BoltSDK.getCardToken(
-        cardNumber,
-        expiryDate,
-        cVc
+        this.state.card.number,
+        this.state.card.expiryDate,
+        this.state.card.cvv
       );
 
-      console.log(token)
-
+      console.log(token);
     } catch (error) {
 
       console.log(error.toString());
-
     }
   }
 
@@ -44,22 +68,54 @@ export default class App extends Component {
 
     const onPressDiscover = () => {
 
-      console.log('on press discover');
-      console.log(BoltSDK);
       BoltSDK.discoverDevice();
-      console.log('after discoverDevice');
+    };
+
+    const onPressActivateDevice = () => {
+
+      BoltSDK.activateDevice();
+    };
+
+    const connectToDevice = (macAddress) => {
+
+      BoltSDK.connectToDevice(macAddress);
+    };
+
+    const onTokenizeCard = () => {
+
+      this.tokenizeCard();
     };
 
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>☆CardConnect example☆</Text>
-        <Text style={styles.instructions}>STATUS: {this.state.status}</Text>
-        <Text style={styles.welcome}>☆NATIVE CALLBACK test MESSAGE☆</Text>
-        <Text style={styles.instructions}>{this.state.message}</Text>
+        <Text style={styles.welcome}>☆Bolt SDK Example☆</Text>
+        <Button 
+          title='Tokenize Card'
+          onPress={onTokenizeCard}
+        />
         <Button 
           title='Discover'
           onPress={onPressDiscover}
         />
+        <Button 
+          title='Activate Device'
+          onPress={onPressActivateDevice}
+        />
+        {Object.keys(this.state.devices).length > 0 && (
+          <FlatList
+            data={Object.values(this.state.devices)}
+            renderItem={({ item }) => (
+            
+              <Text style={styles.item} onPress={() => connectToDevice(item.macAddress)}>{item.name}</Text>
+            )}
+            keyExtractor={item => item.macAddress}
+          />
+          /*<Button
+            key={macAddress}
+            title={`Connect ${this.state.devices[macAddress].name}`}
+            onPress={() => connectToDevice(macAddress)}
+          />*/
+        )}
       </View>
     );
   }
@@ -81,5 +137,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333333',
     marginBottom: 5,
+  },
+  // container: {
+  //   flex: 1,
+  //   marginTop: StatusBar.currentHeight || 0,
+  // },
+  item: {
+    backgroundColor: '#f9c2ff',
+    padding: 20,
+    marginVertical: 8,
+    marginHorizontal: 16,
   },
 });
