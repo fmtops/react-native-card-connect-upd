@@ -174,7 +174,7 @@ export default class App extends Component {
     }
   }
 
-  async tokenizeCard() {
+  tokenizeCard = async () => {
 
     try {
       this.setState({
