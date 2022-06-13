@@ -6,7 +6,6 @@
     "start": "react-native start"
   },
   "dependencies": {
-    "moment": "^2.24.0",
     "react": "16.9.0",
     "react-native": "0.61.5",
     "react-native-card-connect": "git+https://github.com/BigRoomStudios/react-native-card-connect.git"

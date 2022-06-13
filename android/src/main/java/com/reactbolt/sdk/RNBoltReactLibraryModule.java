@@ -1,28 +1,27 @@
+package com.reactbolt.sdk;
 
-package com.reactcardconnect.sdk;
+import com.bolt.consumersdk.CCConsumer;
+import com.bolt.consumersdk.CCConsumerTokenCallback;
+import com.bolt.consumersdk.domain.CCConsumerAccount;
+import com.bolt.consumersdk.domain.CCConsumerCardInfo;
+import com.bolt.consumersdk.domain.CCConsumerError;
+import com.bolt.consumersdk.utils.CCConsumerCardUtils;
 
-import com.cardconnect.consumersdk.CCConsumer;
-import com.cardconnect.consumersdk.CCConsumerTokenCallback;
-import com.cardconnect.consumersdk.domain.CCConsumerAccount;
-import com.cardconnect.consumersdk.domain.CCConsumerCardInfo;
-import com.cardconnect.consumersdk.domain.CCConsumerError;
-import com.cardconnect.consumersdk.utils.CCConsumerCardUtils;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 
+public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
 
-public class RNCardConnectReactLibraryModule extends ReactContextBaseJavaModule {
-
-    public RNCardConnectReactLibraryModule(ReactApplicationContext reactContext) {
+    public RNBoltReactLibraryModule(ReactApplicationContext reactContext) {
         super(reactContext);
     }
 
     @Override
     public String getName() {
-        return "CardConnect";
+        return "BoltSDK";
     }
 
     @ReactMethod
@@ -32,9 +31,6 @@ public class RNCardConnectReactLibraryModule extends ReactContextBaseJavaModule 
       String cvv,
       final Promise promise
     ) {
-        // String cardNumber = options.getString("cardNumber");
-        // String cvv = options.getString("cvv");
-        // String expiryDate = options.getString("expiryDate");
 
         try {
             validateCardNumber(cardNumber);
@@ -90,7 +86,6 @@ public class RNCardConnectReactLibraryModule extends ReactContextBaseJavaModule 
 
     @ReactMethod
     private void setupConsumerApiEndpoint(String url) {
-        CCConsumer.getInstance().getApi().setEndPoint( "https://" + url + "/cardsecure/cs");
-        CCConsumer.getInstance().getApi().setDebugEnabled(true);
+        CCConsumer.getInstance().getApi().setEndPoint(url);
     }
 }
