@@ -63,16 +63,6 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void addListener(String eventName) {
-        // Set up any upstream listeners or background tasks as necessary
-    }
-
-    @ReactMethod
-    public void removeListeners(Integer count) {
-        // Remove upstream listeners, stop unnecessary background tasks
-    }
-
-    @ReactMethod
     public void activateDevice() {
         final SwiperControllerManager swipManager = SwiperControllerManager.getInstance();
         ((CCSwiperController) swipManager.getSwiperController()).startReaders(swipManager.getSwiperCaptureMode());
@@ -201,7 +191,6 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
 
             @Override
             public void onLCDDisplayUpdate(String str) {
-                // mConnectionStateTextView.setText(mConnectionStateTextView.getText() + "\r\n" + str);
             }
 
             @Override
