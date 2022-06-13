@@ -211,42 +211,37 @@ export default class App extends Component {
     }
   }
 
+  onPressDiscover = () => {
+
+    this.setState({ isDiscovering: true });
+    BoltSDK.discoverDevice();
+  }
+
+  onPressActivateDevice = () => {
+
+    this.setState({
+      device: {
+        ...this.state.device,
+        isActivating: true,
+        error: null
+      }
+    });
+    BoltSDK.activateDevice();
+  }
+
+  connectToDevice = (macAddress) => {
+
+    this.setState({
+      isDiscovering: false,
+      device: {
+        ...this.state.device,
+        isConnecting: true
+      }
+    });
+    BoltSDK.connectToDevice(macAddress);
+  }
+
   render() {
-
-    const onPressDiscover = () => {
-
-      this.setState({ isDiscovering: true });
-      BoltSDK.discoverDevice();
-    };
-
-    const onPressActivateDevice = () => {
-
-      this.setState({
-        device: {
-          ...this.state.device,
-          isActivating: true,
-          error: null
-        }
-      });
-      BoltSDK.activateDevice();
-    };
-
-    const connectToDevice = (macAddress) => {
-
-      this.setState({
-        isDiscovering: false,
-        device: {
-          ...this.state.device,
-          isConnecting: true
-        }
-      });
-      BoltSDK.connectToDevice(macAddress);
-    };
-
-    const onTokenizeCard = () => {
-
-      this.tokenizeCard();
-    };
 
     return (
       <View style={styles.container}>
@@ -263,7 +258,7 @@ export default class App extends Component {
         )}
         <Button
           title='Tokenize Test Card'
-          onPress={onTokenizeCard}
+          onPress={this.tokenizeCard}
           disabled={this.state.testCard.isTokenizing}
           style={{ marginBottom: 15 }}
         />
@@ -272,7 +267,7 @@ export default class App extends Component {
             {!this.state.isDiscovering &&  (
               <Button
                 title='Discover'
-                onPress={onPressDiscover}
+                onPress={this.onPressDiscover}
               />
             )}
             {this.state.isDiscovering && (
@@ -280,9 +275,9 @@ export default class App extends Component {
                 data={Object.values(this.state.devices)}
                 renderItem={({ item }) => (
 
-                  <Text style={styles.item} onPress={() => connectToDevice(item.macAddress)}>{item.name}</Text>
+                  <Text style={styles.item} onPress={() => this.connectToDevice(item.macAddress)}>{item.name}</Text>
                 )}
-                keyExtractor={item => item.macAddress}
+                keyExtractor={(item) => item.macAddress}
               />
             )}
           </>
@@ -296,7 +291,7 @@ export default class App extends Component {
         {this.state.device.isConnected && !(this.state.device.isActivating || this.state.device.isActive) && (
           <Button
             title='Activate Device'
-            onPress={onPressActivateDevice}
+            onPress={this.onPressActivateDevice}
           />
         )}
         {this.state.device.isActive && (

@@ -269,7 +269,6 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
     ) {
 
         try {
-            Log.v(TAG, "getCardToken 1");
             validateCardNumber(cardNumber);
             validateCvv(cvv);
 
@@ -278,26 +277,21 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
             mCCConsumerCardInfo.setExpirationDate(expiryDate);
             mCCConsumerCardInfo.setCvv(cvv);
 
-            Log.v(TAG, "getCardToken 2");
             CCConsumer.getInstance().getApi().generateAccountForCard(mCCConsumerCardInfo, new CCConsumerTokenCallback() {
                 @Override
                 public void onCCConsumerTokenResponseError(CCConsumerError ccConsumerError) {
-                    Log.v(TAG, "getCardToken 3");
-                    Log.v(TAG, new Gson().toJson(ccConsumerError));
+                    // Log.v(TAG, new Gson().toJson(ccConsumerError));
                     promise.reject(new Exception(ccConsumerError.getResponseMessage()));
                 }
 
                 @Override
                 public void onCCConsumerTokenResponse(CCConsumerAccount ccConsumerAccount) {
-                    Log.v(TAG, "getCardToken 4");
                     promise.resolve(ccConsumerAccount.getToken());
                 }
             });
         } catch (ValidateException e) {
-            Log.v(TAG, "getCardToken 5");
             promise.reject(e);
         } catch (Exception e) {
-            Log.v(TAG, "getCardToken 6");
             promise.reject(e);
             e.printStackTrace();
         }
