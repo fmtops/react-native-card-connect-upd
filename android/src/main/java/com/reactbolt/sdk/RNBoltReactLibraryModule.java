@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.content.pm.PackageManager;
 import android.Manifest;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -55,7 +56,7 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
         return TAG;
     }
 
-    private void sendEvent(String eventName, WritableMap params) {
+    private void sendEvent(String eventName, @Nullable WritableMap params) {
         context
             .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
             .emit(eventName, params);
@@ -92,100 +93,110 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
             @Override
             public void onTokenGenerated(CCConsumerAccount account, CCConsumerError error) {
                 Log.d(TAG, "onTokenGenerated");
-                // dismissProgressDialog();
+
                 if (error == null) {
                     Log.d(TAG, "Token Generated");
-                    // showSnackBarMessage("Token Generated: " + account.getToken());
-                    // mConnectionStateTextView.setText(mConnectionStateTextView.getText() + "\r\n" + "Token Generated: " + account.getToken());
+
+                    WritableMap params = Arguments.createMap();
+
+                    params.putString("token", account.getToken());
+                    params.putString("name", account.getName());
+
+                    sendEvent("BoltOnTokenGenerated", params);
                 } else {
                     Log.d(TAG, error.getResponseMessage());
-                    // showErrorDialog(error.getResponseMessage());
+
+                    WritableMap params = Arguments.createMap();
+
+                    params.putString("responseError", error.getResponseMessage());
+                    params.putInt("responseCode", error.getResponseCode());
+
+                    sendEvent("BoltOnTokenGeneratedError", params);
                 }
             }
 
             @Override
             public void onError(SwiperError swipeError) {
                 Log.d(TAG, swipeError.toString());
-                // mConnectionStateTextView.setText(mConnectionStateTextView.getText() + "\r\n" + swipeError.toString());
 
+                WritableMap params = Arguments.createMap();
+                params.putString("error", swipeError.toString());
+                sendEvent("BoltOnSwipeError", params);
             }
 
             @Override
             public void onSwiperReadyForCard() {
                 Log.d(TAG, "Swiper ready for card");
-                // showSnackBarMessage(getString(R.string.ready_for_swipe));
+                sendEvent("BoltOnSwiperReady", null);
             }
 
             @Override
             public void onSwiperConnected() {
                 Log.d(TAG, "Swiper connected");
-                swipManager.getSwiperController().setDebugEnabled(true);
-                ((CCSwiperController) swipManager.getSwiperController()).startReaders(swipManager.getSwiperCaptureMode());
-                // mConnectionStateTextView.setText(R.string.connected);
-                // bConnected = true;
-
-                // new Handler().postDelayed(new Runnable() {
-                //     @Override
-                //     public void run() {
-                //         updateSwitchText();
-                //         resetSwiper();
-                //     }
-                // }, 2000);
-
-                // mSwitchSwipeOrTap.setEnabled(true);
+                sendEvent("BoltOnSwiperConnected", null);
             }
 
             @Override
             public void onSwiperDisconnected() {
                 Log.d(TAG, "Swiper disconnected");
-                // mConnectionStateTextView.setText(R.string.disconnected);
+                sendEvent("BoltOnSwiperDisconnected", null);
             }
 
             @Override
             public void onBatteryState(BatteryState batteryState) {
                 Log.d(TAG, batteryState.toString());
-                switch (batteryState){
-                    case LOW:
-                        // showSnackBarMessage("Battery is low!");
-                        Log.d(TAG, "Battery is low!");
-                        break;
-                    case CRITICALLY_LOW:
-                        // showSnackBarMessage("Battery is critically low!");
-                        Log.d(TAG, "Battery is critically low!");
-                        break;
-                }
+
+                WritableMap params = Arguments.createMap();
+                params.putString("batteryState", batteryState.toString());
+                sendEvent("BoltOnBatteryState", params);
             }
 
             @Override
             public void onStartTokenGeneration() {
-                // showProgressDialog();
                 Log.d(TAG, "Token Generation started.");
+                sendEvent("BoltOnTokenGenerationStart", null);
             }
 
             @Override
             public void onLogUpdate(String strLogUpdate) {
                 Log.d(TAG, strLogUpdate);
-                // mConnectionStateTextView.setText(mConnectionStateTextView.getText() + "\r\n" + strLogUpdate);
+
+                WritableMap params = Arguments.createMap();
+                params.putString("log", strLogUpdate);
+                sendEvent("BoltOnLogUpdate", params);
             }
 
             @Override
             public void onDeviceConfigurationUpdate(String s) {
+                Log.d(TAG, s);
+
+                WritableMap params = Arguments.createMap();
+                params.putString("configUpdate", s);
+                sendEvent("BoltOnDeviceConfigurationUpdate", params);
             }
 
             @Override
             public void onConfigurationProgressUpdate(double v) {
+                Log.d(TAG, Double.toString(v));
 
+                WritableMap params = Arguments.createMap();
+                params.putDouble("progress", v);
+                sendEvent("BoltOnDeviceConfigurationProgressUpdate", params);
             }
 
             @Override
             public void onConfigurationComplete(boolean b) {
+                Log.d(TAG, Boolean.toString(b));
 
+                WritableMap params = Arguments.createMap();
+                params.putBoolean("isComplete", b);
+                sendEvent("BoltOnDeviceConfigurationUpdateComplete", params);
             }
 
             @Override
             public void onTimeout() {
-
-                //resetSwiper();
+                Log.d(TAG, "on timeout");
+                sendEvent("BoltOnTimeout", null);
             }
 
             @Override
@@ -195,18 +206,20 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
 
             @Override
             public void onRemoveCardRequested() {
-                // showRemoveCardDialog();
+                Log.d(TAG, "on card remove requested");
+                sendEvent("BoltOnRemoveCardRequested", null);
             }
 
             @Override
             public void onCardRemoved() {
-                // hideRemoveCardDialog();
-                // resetSwiper();
+                Log.d(TAG, "on card removed");
+                sendEvent("BoltOnCardRemoved", null);
             }
 
             @Override
             public void onDeviceBusy() {
-
+                Log.d(TAG, "on device busy");
+                sendEvent("BoltOnDeviceBusy", null);
             }
         };
 
@@ -234,33 +247,12 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
             public void onDeviceFound(BluetoothDevice device) {
                 synchronized (mapDevices) {
 
-                    // Log.v(TAG, "on device found");
-                    // Log.v(TAG, device.getAddress());
-                    // // Log.v(TAG, device.getAlias());
-                    // Log.v(TAG, device.getName());
-
                     WritableMap params = Arguments.createMap();
 
                     params.putString("macAddress", device.getAddress());
                     params.putString("name", device.getName());
 
-                    sendEvent("DeviceFound", params);
-
-                    // onDeviceFoundCallback.invoke(device);
-
-                    // mapDevices.put(device.getAddress(), device);
-
-                    // deviceListAdapter.clear();
-
-                    // for (BluetoothDevice dev : mapDevices.values()) {
-                    //     if (TextUtils.isEmpty(dev.getName())) {
-                    //         deviceListAdapter.add(dev.getAddress());
-                    //     } else {
-                    //         deviceListAdapter.add(dev.getName());
-                    //     }
-                    // }
-
-                    // deviceListAdapter.notifyDataSetChanged();
+                    sendEvent("BoltDeviceFound", params);
                 }
             }
         };
@@ -304,9 +296,9 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
         } catch (ValidateException e) {
             Log.v(TAG, "getCardToken 5");
             promise.reject(e);
-        } catch (Exception e){
+        } catch (Exception e) {
             Log.v(TAG, "getCardToken 6");
-            promise.resolve(e);
+            promise.reject(e);
             e.printStackTrace();
         }
     }
@@ -332,7 +324,6 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
         } catch (Exception e) {
             throw new ValidateException("Invalid ExpiryDate");
         }
-
     }
 
     @ReactMethod

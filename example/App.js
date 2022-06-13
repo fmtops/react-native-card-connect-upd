@@ -17,19 +17,108 @@ export default class App extends Component {
 
   state = {
     devices: {},
-    card: {
+    isDiscovering: false,
+    testCard: {
       number: '4111111111111111',
-      expiryDate: '12/22',
-      cvv: '123'
-    }
+      expirationDate: '12/29',
+      cvv: '123',
+      isTokenizing: false,
+      token: null,
+      tokenError: null
+    },
+    device: {
+      macAddress: null,
+      isConnecting: false,
+      isConnected: false,
+      token: null,
+      isActivating: false,
+      isActive: false,
+      error: null
+    },
+    deviceLogs: []
   };
+
+  eventListeners = [];
+  eventEmitter = null;
 
   componentDidMount() {
 
     BoltSDK.setupConsumerApiEndpoint(SITE_URL);
 
-    const eventEmitter = new NativeEventEmitter(NativeModules.BoltSDK);
-    this.eventListener = eventEmitter.addListener('DeviceFound', this.onDeviceFound);
+    this.eventEmitter = new NativeEventEmitter(NativeModules.BoltSDK);
+
+    this.eventListeners.push(this.eventEmitter.addListener('BoltDeviceFound', this.onDeviceFound));
+
+    this.eventListeners.push(this.eventEmitter.addListener('BoltOnTokenGenerated', this.onTokenGenerated));
+    this.eventListeners.push(this.eventEmitter.addListener('BoltOnTokenGeneratedError', this.onTokenGeneratedError));
+
+    this.eventListeners.push(this.eventEmitter.addListener('BoltOnSwiperConnected', this.onDeviceConnected));
+    this.eventListeners.push(this.eventEmitter.addListener('BoltOnSwiperDisconnected', this.onDeviceDisconnected));
+    this.eventListeners.push(this.eventEmitter.addListener('BoltOnSwiperReady', this.onDeviceReady));
+    this.eventListeners.push(this.eventEmitter.addListener('BoltOnSwipeError', this.logEvent));
+    this.eventListeners.push(this.eventEmitter.addListener('BoltOnTokenGenerationStart', this.logEvent));
+    this.eventListeners.push(this.eventEmitter.addListener('BoltOnRemoveCardRequested', this.logEvent));
+
+    this.eventListeners.push(this.eventEmitter.addListener('BoltOnBatteryState', this.logEvent));
+    this.eventListeners.push(this.eventEmitter.addListener('BoltOnLogUpdate', this.captureLog));
+    this.eventListeners.push(this.eventEmitter.addListener('BoltOnDeviceConfigurationUpdate', this.captureConfigLog));
+    this.eventListeners.push(this.eventEmitter.addListener('BoltOnDeviceConfigurationProgressUpdate', this.logEvent));
+    this.eventListeners.push(this.eventEmitter.addListener('BoltOnDeviceConfigurationUpdateComplete', this.logEvent));
+
+    this.eventListeners.push(this.eventEmitter.addListener('BoltOnTimeout', this.onDeviceTimeout));
+    this.eventListeners.push(this.eventEmitter.addListener('BoltOnCardRemoved', this.logEvent));
+    this.eventListeners.push(this.eventEmitter.addListener('BoltOnDeviceBusy', this.logEvent));
+  }
+
+  logEvent = (params) => {
+
+    console.log('event received');
+    console.log(params);
+  }
+
+  captureLog = ({ log }) => {
+
+    this.setState({
+      deviceLogs: [ ...this.state.deviceLogs, log ]
+    });
+  }
+
+  captureConfigLog= ({ configUpdate }) => {
+
+    this.setState({
+      deviceLogs: [ ...this.state.deviceLogs, configUpdate ]
+    });
+  }
+
+  onDeviceConnected = () => {
+
+    this.setState({
+      device: {
+        ...this.state.device,
+        isConnected: true,
+        isConnecting: false
+      }
+    });
+  }
+
+  onDeviceDisconnected = () => {
+
+    this.setState({
+      device: {
+        ...this.state.device,
+        isConnected: false
+      }
+    });
+  }
+
+  onDeviceTimeout = () => {
+
+    this.setState({
+      device: {
+        ...this.state.device,
+        isActive: false
+      }
+    });
   }
 
   // the Bolt SDK will return the same device multiplle times, so we'll keep all
@@ -44,23 +133,81 @@ export default class App extends Component {
     });
   }
 
+  onDeviceReady = () => {
+
+    this.setState({
+      device: {
+        ...this.state.device,
+        isActivating: false,
+        isActive: true
+      }
+    });
+  }
+
+  onTokenGenerated = ({ token, name }) => {
+
+    this.setState({
+      device: {
+        ...this.state.device,
+        token: params.token,
+        isActive: false
+      }
+    });
+  }
+
+  onTokenGeneratedError = ({ responseError, responseCode }) => {
+
+    this.setState({
+      device: {
+        ...this.state.device,
+        isActive: false,
+        error: `Error ${responseCode}: ${responseError}`
+      }
+    });
+  }
+
   componentWillUnmount() {
-    this.eventListener.remove();
+
+    let listener;
+    while(listener = this.eventListeners.pop()) {
+      listener.remove();
+    }
   }
 
   async tokenizeCard() {
 
     try {
+      this.setState({
+        testCard: {
+          ...this.state.testCard,
+          isTokenizing: true,
+          tokenError: null,
+          token: null
+        }
+      });
+
       const token = await BoltSDK.getCardToken(
-        this.state.card.number,
-        this.state.card.expiryDate,
-        this.state.card.cvv
+        this.state.testCard.number,
+        this.state.testCard.expirationDate,
+        this.state.testCard.cvv
       );
 
-      console.log(token);
+      this.setState({
+        testCard: {
+          ...this.state.testCard,
+          isTokenizing: false,
+          token
+        }
+      });
     } catch (error) {
 
-      console.log(error.toString());
+      this.setState({
+        testCard: {
+          ...this.state.testCard,
+          isTokenizing: false,
+          tokenError: error.toString()
+        }
+      });
     }
   }
 
@@ -68,16 +215,31 @@ export default class App extends Component {
 
     const onPressDiscover = () => {
 
+      this.setState({ isDiscovering: true });
       BoltSDK.discoverDevice();
     };
 
     const onPressActivateDevice = () => {
 
+      this.setState({
+        device: {
+          ...this.state.device,
+          isActivating: true,
+          error: null
+        }
+      });
       BoltSDK.activateDevice();
     };
 
     const connectToDevice = (macAddress) => {
 
+      this.setState({
+        isDiscovering: false,
+        device: {
+          ...this.state.device,
+          isConnecting: true
+        }
+      });
       BoltSDK.connectToDevice(macAddress);
     };
 
@@ -89,33 +251,65 @@ export default class App extends Component {
     return (
       <View style={styles.container}>
         <Text style={styles.welcome}>☆Bolt SDK Example☆</Text>
-        <Button 
-          title='Tokenize Card'
-          onPress={onTokenizeCard}
-        />
-        <Button 
-          title='Discover'
-          onPress={onPressDiscover}
-        />
-        <Button 
-          title='Activate Device'
-          onPress={onPressActivateDevice}
-        />
-        {Object.keys(this.state.devices).length > 0 && (
-          <FlatList
-            data={Object.values(this.state.devices)}
-            renderItem={({ item }) => (
-            
-              <Text style={styles.item} onPress={() => connectToDevice(item.macAddress)}>{item.name}</Text>
-            )}
-            keyExtractor={item => item.macAddress}
-          />
-          /*<Button
-            key={macAddress}
-            title={`Connect ${this.state.devices[macAddress].name}`}
-            onPress={() => connectToDevice(macAddress)}
-          />*/
+        <Text style={styles.testCardHeader}>Test Card:</Text>
+        <Text>{this.state.testCard.number}</Text>
+        <Text>{this.state.testCard.expirationDate}</Text>
+        <Text style={{ marginBottom: 10 }}>{this.state.testCard.cvv}</Text>
+        {this.state.testCard.token && (
+          <>
+            <Text style={styles.testCardHeader}>Token:</Text>
+            <Text style={{ marginBottom: 10 }}>{this.state.testCard.token}</Text>
+          </>
         )}
+        <Button
+          title='Tokenize Test Card'
+          onPress={onTokenizeCard}
+          disabled={this.state.testCard.isTokenizing}
+          style={{ marginBottom: 15 }}
+        />
+        {!(this.state.device.isConnected || this.state.device.isConnecting) && (
+          <>
+            {!this.state.isDiscovering &&  (
+              <Button
+                title='Discover'
+                onPress={onPressDiscover}
+              />
+            )}
+            {this.state.isDiscovering && (
+              <FlatList
+                data={Object.values(this.state.devices)}
+                renderItem={({ item }) => (
+
+                  <Text style={styles.item} onPress={() => connectToDevice(item.macAddress)}>{item.name}</Text>
+                )}
+                keyExtractor={item => item.macAddress}
+              />
+            )}
+          </>
+        )}
+        {this.state.device.isConnecting && (
+          <Text>Connecting to device</Text>
+        )}
+        {this.state.device.isActivating && (
+          <Text>Activating device</Text>
+        )}
+        {this.state.device.isConnected && !(this.state.device.isActivating || this.state.device.isActive) && (
+          <Button
+            title='Activate Device'
+            onPress={onPressActivateDevice}
+          />
+        )}
+        {this.state.device.isActive && (
+          <Text>Device ready: swipe or insert card</Text>
+        )}
+        {this.state.device.error && (
+          <Text>{this.state.device.error}</Text>
+        )}
+        <Text style={styles.welcome}>☆Device Logs☆</Text>
+        {this.state.deviceLogs.map((log, index) => (
+
+          <Text key={index}>{log}</Text>
+        ))}
       </View>
     );
   }
@@ -124,24 +318,23 @@ export default class App extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     backgroundColor: '#F5FCFF',
+    margin: 20
+  },
+  testCardHeader: {
+    fontWeight: 'bold'
   },
   welcome: {
     fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
+    marginTop: 10,
+    marginBottom: 10
   },
   instructions: {
     textAlign: 'center',
     color: '#333333',
     marginBottom: 5,
   },
-  // container: {
-  //   flex: 1,
-  //   marginTop: StatusBar.currentHeight || 0,
-  // },
   item: {
     backgroundColor: '#f9c2ff',
     padding: 20,
