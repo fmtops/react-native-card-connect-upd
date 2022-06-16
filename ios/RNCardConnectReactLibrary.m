@@ -2,7 +2,7 @@
 #import "RNCardConnectReactLibrary.h"
 #import <CardConnectConsumerSDK/CardConnectConsumerSDK.h>
 #import <CardConnectConsumerSDK/CCCCardInfo.h>
-#import <CardConnectConsumerSDK/CCCAccount.h>
+#import <BoltMobileSDK/BMSAccount.h>
 #import <React/RCTLog.h>
 #import <React/RCTConvert.h>
 
@@ -13,7 +13,7 @@
     return dispatch_get_main_queue();
 }
 
-RCT_EXPORT_MODULE(CardConnect)
+RCT_EXPORT_MODULE(BoltSDK)
 
 RCT_EXPORT_METHOD(setupConsumerApiEndpoint:(NSString *)endpoint) {
     [CCCAPI instance].endpoint = endpoint;
