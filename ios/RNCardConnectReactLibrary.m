@@ -268,8 +268,9 @@ rejecter:(RCTPromiseRejectBlock)reject)
     RCTLogInfo(@"swiper foundDevices");
 
     BMSDevice *device = [devices objectAtIndex:0];
+    NSString *uuid = [device.uuid UUIDString];
     // int value = returnedObject.aVariable;
-    [self sendEventWithName:@"BoltDeviceFound" body:@{@"macAddress": device.uuid, @"name": device.name}];
+    [self sendEventWithName:@"BoltDeviceFound" body:@{@"macAddress": uuid, @"name": device.name}];
 }
 
 - (void)swiper:(BMSSwiperController*)swiper displayMessage:(NSString*)message canCancel:(BOOL)cancelable
