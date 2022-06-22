@@ -2,6 +2,7 @@
 #import <BoltMobileSDK/BoltMobileSDK.h>
 #import <BoltMobileSDK/BMSCardInfo.h>
 #import <BoltMobileSDK/BMSAccount.h>
+#import <BoltMobileSDK/BMSSwiperController.h>
 #import <React/RCTLog.h>
 #import <React/RCTConvert.h>
 
@@ -13,6 +14,15 @@
 }
 
 RCT_EXPORT_MODULE(BoltSDK)
+
+RCT_EXPORT_METHOD(discoverDevice) {
+
+    RCTLogInfo(@"discovering devices?!?!");
+
+    self.swiper = [[BMSSwiperController alloc] initWithDelegate:self swiper:BMSSwiperTypeVP3300 loggingEnabled:YES];
+
+    [self.swiper findDevices];
+}
 
 RCT_EXPORT_METHOD(setupConsumerApiEndpoint:(NSString *)endpoint) {
     [BMSAPI instance].endpoint = endpoint;

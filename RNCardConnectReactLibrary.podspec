@@ -15,5 +15,5 @@ Pod::Spec.new do |s|
   s.source_files = "ios/*.{h,m}"
   s.requires_arc = true
   s.dependency "React"
-  s.ios.vendored_frameworks = "**/ios/BoltMobileSDK.framework"
+  s.ios.vendored_frameworks = "**/ios/BoltMobileSDK.framework", "**/ios/BoltMobileSDK.framework/IDTech.bundle"
 end
