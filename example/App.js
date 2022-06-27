@@ -55,7 +55,8 @@ export default class App extends Component {
     this.eventListeners.push(this.eventEmitter.addListener('BoltOnSwiperConnected', this.onDeviceConnected));
     this.eventListeners.push(this.eventEmitter.addListener('BoltOnSwiperDisconnected', this.onDeviceDisconnected));
     this.eventListeners.push(this.eventEmitter.addListener('BoltOnSwiperReady', this.onDeviceReady));
-    this.eventListeners.push(this.eventEmitter.addListener('BoltOnSwipeError', this.logEvent));
+    // this.eventListeners.push(this.eventEmitter.addListener('BoltOnSwipeError', this.logEvent));
+    this.eventListeners.push(this.eventEmitter.addListener('BoltOnSwiperError', this.logEvent));
     this.eventListeners.push(this.eventEmitter.addListener('BoltOnTokenGenerationStart', this.logEvent));
     this.eventListeners.push(this.eventEmitter.addListener('BoltOnRemoveCardRequested', this.logEvent));
 
