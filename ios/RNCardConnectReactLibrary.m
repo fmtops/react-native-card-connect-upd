@@ -24,6 +24,12 @@ RCT_EXPORT_METHOD(discoverDevice) {
     [self.swiper findDevices];
 }
 
+// RCT_EXPORT_METHOD(getDeviceStatus) {
+//     RCTLogInfo(@"get device status?!?!");
+//     self.swiper = [[BMSSwiperController alloc] initWithDelegate:self swiper:BMSSwiperTypeVP3300 loggingEnabled:YES];
+//     [self.swiper findDevices];
+// }
+
 RCT_EXPORT_METHOD(setupConsumerApiEndpoint:(NSString *)endpoint) {
     [BMSAPI instance].endpoint = endpoint;
     [BMSAPI instance].enableLogging = true;
@@ -46,8 +52,6 @@ rejecter:(RCTPromiseRejectBlock)reject)
         }
     }];
 }
-
-// public void connectToDevice(String macAddress) {
 
 RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
 
@@ -98,6 +102,7 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
     switch (state) {
         case BMSSwiperConnectionStateConnected:
             NSLog(@"Did Connect Swiper");
+            // _swiper.connectionState;
             [self sendEventWithName:@"BoltOnSwiperConnected" body:@{}];
             break;
         case BMSSwiperConnectionStateDisconnected:
@@ -143,7 +148,13 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
     RCTLogInfo(@"swiper didFailWithError");
     RCTLogInfo(error.localizedDescription);
 
-    [self sendEventWithName:@"BoltOnSwiperError" body:@{@"error": error.localizedDescription}];
+
+    [self sendEventWithName:@"BoltOnSwiperError" body:@{
+        @"errorLocalizedDescription": error.localizedDescription?error.localizedDescription:@"no localized description",
+        @"errorLocalizedRecoverySuggestion": error.localizedRecoverySuggestion?error.localizedRecoverySuggestion:@"no localized recovery suggestion",
+        @"errorLocalizedFailureReason": error.localizedFailureReason?error.localizedFailureReason:@"no localized failure reason"
+    }];
+
     //  hmmmmm?
     //     [errorMessage appendFormat:@"\n\n%@", [error.userInfo valueForKey:@"firmwareVersion"]];
 
