@@ -7,7 +7,7 @@
 #import <React/RCTEventEmitter.h>
 #endif
 
-typedef void (^ActivateBlock)();
+// typedef void (^ActivateBlock)();
 
 #import <BoltMobileSDK/BMSSwiperController.h>
 // #import <BoltMobileSDK/BMSSwiperControllerDelegate.h>
@@ -18,7 +18,8 @@ typedef void (^ActivateBlock)();
 
 @property (nonatomic) Boolean isConnecting;
 
-@property (readwrite, copy) ActivateBlock activate;
+// @property (readwrite, copy) ActivateBlock activate;
+@property (nonatomic, copy) void(^restartReaderBlock)(void);
 
 @end
   

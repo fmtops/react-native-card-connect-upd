@@ -51,9 +51,9 @@ RCT_EXPORT_METHOD(activate) {
 
     [self sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"activate"}];
 
-    if (self.activate) {
-        self.activate();
-        self.activate = nil;
+    if (self.restartReaderBlock) {
+        self.restartReaderBlock();
+        self.restartReaderBlock = nil;
     }
 }
 
@@ -169,7 +169,7 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
 
     // todo: call completion();?????
     // completion();
-    self.activate = completion;
+    self.restartReaderBlock = completion;
 }
 
 - (void)swiper:(BMSSwiper *)swiper didFailWithError:(NSError *)error completion:(void (^)(void))completion
@@ -177,7 +177,7 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
     RCTLogInfo(@"swiper didFailWithError");
     RCTLogInfo(error.localizedDescription);
 
-    self.activate = completion;
+    self.restartReaderBlock = completion;
 
     // ignore these errors while connecting
     if (self.isConnecting && [error.localizedDescription isEqualToString:@"Failed to connect to device."]) {
