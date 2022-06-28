@@ -14,5 +14,8 @@
 
 @property (nonatomic, strong) BMSSwiperController *swiper;
 
+// add isConnecting boolean property
+@property Boolean isConnecting;
+
 @end
   
