@@ -69,6 +69,7 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
         @"BoltOnTokenGeneratedError",
         @"BoltOnSwiperConnected",
         @"BoltOnSwiperDisconnected",
+        @"BoltOnSwiperConnecting",
         @"BoltOnSwiperReady",
         @"BoltOnSwiperError",
         @"BoltOnTokenGenerationStart",
