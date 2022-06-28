@@ -60,6 +60,13 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
     self.isConnecting = true;
 }
 
+- (RNCardConnectReactLibrary *)init {
+    if (self = [super init]) {
+        self.isConnecting = false;
+    }
+    return self;
+}
+
 - (void)swiper:(BMSSwiperController *)swiper configurationProgress:(float)progress {
 
     [self sendEventWithName:@"BoltOnDeviceConfigurationProgressUpdate" body:@{@"progress": [NSNumber numberWithFloat:progress]}];
@@ -67,9 +74,14 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
 
 - (void)swiper:(BMSSwiperController *)swiper displayMessage:(NSString *)message canCancel:(BOOL)cancelable {
 
+    [self sendEventWithName:@"BoltOnLogUpdate" body:@{
+        @"self.isConnecting": self.isConnecting?@"Yes":@"No",
+        @"[message isEqualToString:'PLEASE SWIPE, TAP, OR INSERT']": [message isEqualToString:@"PLEASE SWIPE, TAP, OR INSERT"]?@"Yes":@"No"
+    }];
+
     // TODO: If self.isConnecting, and  message == 'PLEASE SWIPE,  TAP, OR INSERT', cancel the transaction
     // TODO: Once cancelled, send device connected event
-    if (self.isConnecting && message == @"PLEASE SWIPE, TAP, OR INSERT") {
+    if (self.isConnecting && [message isEqualToString:@"PLEASE SWIPE, TAP, OR INSERT"]) {
         
         [self sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"in display message, caught during is connecting, should cancel soon"}];
 
@@ -154,7 +166,7 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
     RCTLogInfo(error.localizedDescription);
 
     // ignore these errors while connecting
-    if (self.isConnecting && error.localizedDescription == @"Failed to connect to device.") {
+    if (self.isConnecting && [error.localizedDescription isEqualToString:@"Failed to connect to device."]) {
         [self sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"didFailWithError: ignoring"}];
         return;
     }
