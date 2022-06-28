@@ -76,14 +76,14 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
 
     [self sendEventWithName:@"BoltOnLogUpdate" body:@{
         @"self.isConnecting": self.isConnecting?@"Yes":@"No",
-        @"[message isEqualToString:'PLEASE SWIPE, TAP, OR INSERT']": [message isEqualToString:@"PLEASE SWIPE, TAP, OR INSERT"]?@"Yes":@"No",
+        @"[message isEqualToString:'PLEASE SWIPE,\nTAP, OR INSERT']": [message isEqualToString:@"PLEASE SWIPE,\nTAP, OR INSERT"]?@"Yes":@"No",
         @"message": message,
-        @"compare": @"PLEASE SWIPE, TAP, OR INSERT"
+        @"compare": @"PLEASE SWIPE,\nTAP, OR INSERT"
     }];
 
-    // TODO: If self.isConnecting, and  message == 'PLEASE SWIPE,  TAP, OR INSERT', cancel the transaction
+    // TODO: If self.isConnecting, and  message == 'PLEASE SWIPE,\nTAP, OR INSERT', cancel the transaction
     // TODO: Once cancelled, send device connected event
-    if (self.isConnecting && [message isEqualToString:@"PLEASE SWIPE, TAP, OR INSERT"]) {
+    if (self.isConnecting && [message isEqualToString:@"PLEASE SWIPE,\nTAP, OR INSERT"]) {
         
         [self sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"in display message, caught during is connecting, should cancel soon"}];
 
