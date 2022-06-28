@@ -92,8 +92,8 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [weakSelf.swiper cancelTransaction];
             [weakSelf sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"inside dispatcch_after, after cancelTransactionn!!!"}];
-            [weakSelf sendEventWithName:@"BoltOnSwiperConnected" body:@{}];
-            weakSelf.isConnecting = false;
+            // [weakSelf sendEventWithName:@"BoltOnSwiperConnected" body:@{}];
+            // weakSelf.isConnecting = false;
         });
     }
     else {
@@ -110,11 +110,10 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
         case BMSSwiperConnectionStateConnected:
             NSLog(@"Did Connect Swiper");
             [self sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"connection state changed: connected"}];
-            // _swiper.connectionState;
-            if (self.isConnecting) {
-                // TODO: maybe do something?
+
+            if (!self.isConnecting) {
+                [self sendEventWithName:@"BoltOnSwiperConnected" body:@{}];
             }
-            [self sendEventWithName:@"BoltOnSwiperConnected" body:@{}];
             break;
         case BMSSwiperConnectionStateDisconnected:
 
@@ -159,7 +158,7 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
     [self sendEventWithName:@"BoltOnTokenGenerated" body:@{@"token": account.token}];
 
     // todo: call completion();?????
-    completion();
+    // completion();
 }
 
 - (void)swiper:(BMSSwiper *)swiper didFailWithError:(NSError *)error completion:(void (^)(void))completion
@@ -170,6 +169,12 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
     // ignore these errors while connecting
     if (self.isConnecting && [error.localizedDescription isEqualToString:@"Failed to connect to device."]) {
         [self sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"didFailWithError: ignoring"}];
+        return;
+    }
+    if (self.isConnecting && [error.localizedDescription isEqualToString:@"Canceled transaction."]) {
+        [self sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"didFailWithError: canceled transaction -- we're connected!"}];
+        [self sendEventWithName:@"BoltOnSwiperConnected" body:@{}];
+        self.isConnecting = false;
         return;
     }
 
@@ -184,7 +189,7 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
     //  hmmmmm?
     //     [errorMessage appendFormat:@"\n\n%@", [error.userInfo valueForKey:@"firmwareVersion"]];
 
-    completion();
+    // completion();
 }
 
 - (void)swiper:(BMSSwiperController*)swiper foundDevices:(NSArray*)devices
