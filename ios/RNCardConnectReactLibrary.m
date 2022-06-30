@@ -47,9 +47,9 @@ RCT_EXPORT_METHOD(discoverDevice) {
     [self.swiper findDevices];
 }
 
-RCT_EXPORT_METHOD(activate) {
+RCT_EXPORT_METHOD(activateDevice) {
 
-    [self sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"activate"}];
+    [self sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"activateDevice"}];
 
     if (self.restartReaderBlock) {
         self.restartReaderBlock();
