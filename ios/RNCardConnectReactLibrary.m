@@ -8,21 +8,29 @@
 
 @implementation RNCardConnectReactLibrary
 
-- (dispatch_queue_t)methodQueue
-{
+RCT_EXPORT_MODULE(BoltSDK)
+
+- (RNCardConnectReactLibrary *)init {
+    if (self = [super init]) {
+        self.isConnecting = false;
+        [BMSAPI instance].enableLogging = true;
+    }
+    return self;
+}
+
+- (dispatch_queue_t)methodQueue {
+
     return dispatch_get_main_queue();
 }
 
-RCT_EXPORT_MODULE(BoltSDK)
-
 RCT_EXPORT_METHOD(setupConsumerApiEndpoint:(NSString *)endpoint) {
+
     [BMSAPI instance].endpoint = endpoint;
-    [BMSAPI instance].enableLogging = true;
 }
 
 RCT_EXPORT_METHOD(getCardToken:(NSString *)cardNumber expirationDate:(NSString *)expirationDate CVV:(NSString *)CVV                   resolve: (RCTPromiseResolveBlock)resolve
-rejecter:(RCTPromiseRejectBlock)reject)
-{
+rejecter:(RCTPromiseRejectBlock)reject) {
+
     BMSCardInfo *card = [BMSCardInfo new];
 
     card.cardNumber = cardNumber;
@@ -40,16 +48,12 @@ rejecter:(RCTPromiseRejectBlock)reject)
 
 RCT_EXPORT_METHOD(discoverDevice) {
 
-    RCTLogInfo(@"discovering devices?!?!");
-
-    self.swiper = [[BMSSwiperController alloc] initWithDelegate:self swiper:BMSSwiperTypeVP3300 loggingEnabled:YES];
-
     [self.swiper findDevices];
 }
 
 RCT_EXPORT_METHOD(activateDevice) {
 
-    [self sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"activateDevice"}];
+    // [self sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"activateDevice"}];
 
     if (self.restartReaderBlock) {
         self.restartReaderBlock();
@@ -58,8 +62,6 @@ RCT_EXPORT_METHOD(activateDevice) {
 }
 
 RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
-
-    RCTLogInfo(@"connecting to device?!?!");
 
     // TODO: stop searching
 
@@ -70,13 +72,6 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
     self.isConnecting = true;
 }
 
-- (RNCardConnectReactLibrary *)init {
-    if (self = [super init]) {
-        self.isConnecting = false;
-    }
-    return self;
-}
-
 - (void)swiper:(BMSSwiperController *)swiper configurationProgress:(float)progress {
 
     [self sendEventWithName:@"BoltOnDeviceConfigurationProgressUpdate" body:@{@"progress": [NSNumber numberWithFloat:progress]}];
@@ -84,68 +79,47 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
 
 - (void)swiper:(BMSSwiperController *)swiper displayMessage:(NSString *)message canCancel:(BOOL)cancelable {
 
-    [self sendEventWithName:@"BoltOnLogUpdate" body:@{
-        @"self.isConnecting": self.isConnecting?@"Yes":@"No",
-        @"[message isEqualToString:'PLEASE SWIPE,\nTAP, OR INSERT']": [message isEqualToString:@"PLEASE SWIPE,\nTAP, OR INSERT"]?@"Yes":@"No",
-        @"message": message,
-        @"compare": @"PLEASE SWIPE,\nTAP, OR INSERT"
-    }];
-
-    // TODO: If self.isConnecting, and  message == 'PLEASE SWIPE,\nTAP, OR INSERT', cancel the transaction
-    // TODO: Once cancelled, send device connected event
+    // device will automatically activate when connecting, so we silently cancel the transaction while connecting
     if (self.isConnecting && [message isEqualToString:@"PLEASE SWIPE,\nTAP, OR INSERT"]) {
-        
-        [self sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"in display message, caught during is connecting, should cancel soon"}];
 
         __weak RNCardConnectReactLibrary *weakSelf = self;
+
         // This is required to give the terminal enough time to finish starting before canceling
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            // cancel the transaction to complete the connecting process
             [weakSelf.swiper cancelTransaction];
-            [weakSelf sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"inside dispatcch_after, after cancelTransactionn!!!"}];
-            // [weakSelf sendEventWithName:@"BoltOnSwiperConnected" body:@{}];
-            // weakSelf.isConnecting = false;
         });
     }
     else {
-        // TODO: otherwise send the darn message
+        // broadcast the device message to react native
         [self sendEventWithName:@"BoltOnDeviceMessage" body:@{@"message": message}];
     }
 }
 
 - (void)swiper:(BMSSwiper *)swiper connectionStateHasChanged:(BMSSwiperConnectionState)state {
 
-    RCTLogInfo(@"swiper connectionStateHasChanged");
-
     switch (state) {
         case BMSSwiperConnectionStateConnected:
-            NSLog(@"Did Connect Swiper");
-            [self sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"connection state changed: connected"}];
-
+            // swallow this message while connecting because we need to wait for the first transaction to cancel
             if (!self.isConnecting) {
                 [self sendEventWithName:@"BoltOnSwiperConnected" body:@{}];
             }
             break;
         case BMSSwiperConnectionStateDisconnected:
-
-            NSLog(@"Did Disconnect Swiper");
-            [self sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"connection state changed: disconnected"}];
+            // we will repeatedly receive a disconnected state change while the device is connecting
+            // silently swallow these
             if (!self.isConnecting) {
                 [self sendEventWithName:@"BoltOnSwiperDisconnected" body:@{}];
             }
             break;
         case BMSSwiperConnectionStateConfiguring:
-            NSLog(@"Configuring Device");
-            [self sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"connection state changed: configuring"}];
             [self sendEventWithName:@"BoltOnDeviceBusy" body:@{}];
             break;
         case BMSSwiperConnectionStateConnecting:
-            NSLog(@"Will Connect Swiper");
-            [self sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"connection state changed: connecting"}];
             [self sendEventWithName:@"BoltOnSwiperConnecting" body:@{}];
-                break;
+            break;
         case BMSSwiperConnectionStateSearching:
-            NSLog(@"searching for Swiper");
-            [self sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"connection state changed: searching"}];
+            // [self sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"connection state changed: searching"}];
             // ignore for now
             break;
         default:
@@ -153,66 +127,46 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
     }
 }
 
-- (void)swiperDidStartCardRead:(BMSSwiper *)swiper
-{
-    RCTLogInfo(@"swiper swiperDidStartCardRead");
+- (void)swiperDidStartCardRead:(BMSSwiper *)swiper {
 
     [self sendEventWithName:@"BoltOnTokenGenerationStart" body:@{}];
-    [self sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"swiperDidStartCardRead"}];
 }
 
-- (void)swiper:(BMSSwiper *)swiper didGenerateTokenWithAccount:(BMSAccount *)account completion:(void (^)(void))completion
-{
-    RCTLogInfo(@"swiper didGenerateTokenWithAccount");
+- (void)swiper:(BMSSwiper *)swiper didGenerateTokenWithAccount:(BMSAccount *)account completion:(void (^)(void))completion {
 
     [self sendEventWithName:@"BoltOnTokenGenerated" body:@{@"token": account.token}];
 
-    // todo: call completion();?????
-    // completion();
+    // store the completion block, so we can reactivate the device when needed
     self.restartReaderBlock = completion;
 }
 
-- (void)swiper:(BMSSwiper *)swiper didFailWithError:(NSError *)error completion:(void (^)(void))completion
-{
-    RCTLogInfo(@"swiper didFailWithError");
-    RCTLogInfo(error.localizedDescription);
+- (void)swiper:(BMSSwiper *)swiper didFailWithError:(NSError *)error completion:(void (^)(void))completion {
 
+    // store the completion block, so we can reactivate the device when needed
     self.restartReaderBlock = completion;
 
-    // ignore these errors while connecting
+    // this error will get issued repeatedly while connecting, ignore
     if (self.isConnecting && [error.localizedDescription isEqualToString:@"Failed to connect to device."]) {
-        [self sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"didFailWithError: ignoring"}];
         return;
     }
+
+    // the device will automatically activate after connecting
+    // we cancel this transaction to complete the connection process
     if (self.isConnecting && [error.localizedDescription isEqualToString:@"Canceled transaction."]) {
-        [self sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"didFailWithError: canceled transaction -- we're connected!"}];
         [self sendEventWithName:@"BoltOnSwiperConnected" body:@{}];
         self.isConnecting = false;
         return;
     }
 
-    [self sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"didFailWithError: broadcasting"}];
-
-    [self sendEventWithName:@"BoltOnSwiperError" body:@{
-        @"errorLocalizedDescription": error.localizedDescription?error.localizedDescription:@"no localized description",
-        @"errorLocalizedRecoverySuggestion": error.localizedRecoverySuggestion?error.localizedRecoverySuggestion:@"no localized recovery suggestion",
-        @"errorLocalizedFailureReason": error.localizedFailureReason?error.localizedFailureReason:@"no localized failure reason"
-    }];
-
-    //  hmmmmm?
-    //     [errorMessage appendFormat:@"\n\n%@", [error.userInfo valueForKey:@"firmwareVersion"]];
-
-    // completion();
+    [self sendEventWithName:@"BoltOnSwiperError" body:@{ @"errorLocalizedDescription": error.localizedDescription?error.localizedDescription:@"no localized description" }];
 }
 
-- (void)swiper:(BMSSwiperController*)swiper foundDevices:(NSArray*)devices
-{
-    RCTLogInfo(@"swiper foundDevices");
+- (void)swiper:(BMSSwiperController*)swiper foundDevices:(NSArray*)devices {
 
     BMSDevice *device = [devices objectAtIndex:0];
     NSString *uuid = [device.uuid UUIDString];
     // int value = returnedObject.aVariable;
-    [self sendEventWithName:@"BoltDeviceFound" body:@{@"macAddress": uuid, @"name": device.name}];
+    [self sendEventWithName:@"BoltDeviceFound" body:@{@"id": uuid, @"name": device.name}];
 }
 
 - (NSArray<NSString *> *)supportedEvents {

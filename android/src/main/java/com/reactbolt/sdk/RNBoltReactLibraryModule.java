@@ -238,7 +238,7 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
 
                     WritableMap params = Arguments.createMap();
 
-                    params.putString("macAddress", device.getAddress());
+                    params.putString("id", device.getAddress());
                     params.putString("name", device.getName());
 
                     sendEvent("BoltDeviceFound", params);

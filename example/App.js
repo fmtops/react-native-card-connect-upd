@@ -27,7 +27,7 @@ export default class App extends Component {
       tokenError: null
     },
     device: {
-      macAddress: null,
+      id: null,
       isConnecting: false,
       isConnected: false,
       token: null,
@@ -55,7 +55,6 @@ export default class App extends Component {
     this.eventListeners.push(this.eventEmitter.addListener('BoltOnSwiperConnected', this.onDeviceConnected));
     this.eventListeners.push(this.eventEmitter.addListener('BoltOnSwiperDisconnected', this.onDeviceDisconnected));
     this.eventListeners.push(this.eventEmitter.addListener('BoltOnSwiperReady', this.onDeviceReady));
-    // this.eventListeners.push(this.eventEmitter.addListener('BoltOnSwipeError', this.logEvent));
     this.eventListeners.push(this.eventEmitter.addListener('BoltOnSwiperError', this.logEvent));
     this.eventListeners.push(this.eventEmitter.addListener('BoltOnTokenGenerationStart', this.logEvent));
     this.eventListeners.push(this.eventEmitter.addListener('BoltOnRemoveCardRequested', this.logEvent));
@@ -122,14 +121,14 @@ export default class App extends Component {
     });
   }
 
-  // the Bolt SDK will return the same device multiplle times, so we'll keep all
-  // stored devices unique by storing them keyed on their macAddress
+  // the Bolt SDK will return the same device multiple times, so we'll keep all
+  // stored devices unique by storing them keyed on their id (macAdress on android, uuid on iOS)
   onDeviceFound = (device) => {
 
     this.setState({
       devices: {
         ...this.state.devices,
-        [device.macAddress]: device
+        [device.id]: device
       }
     });
   }
@@ -230,7 +229,7 @@ export default class App extends Component {
     BoltSDK.activateDevice();
   }
 
-  connectToDevice = (macAddress) => {
+  connectToDevice = (id) => {
 
     this.setState({
       isDiscovering: false,
@@ -239,7 +238,7 @@ export default class App extends Component {
         isConnecting: true
       }
     });
-    BoltSDK.connectToDevice(macAddress);
+    BoltSDK.connectToDevice(id);
   }
 
   render() {
@@ -276,9 +275,9 @@ export default class App extends Component {
                 data={Object.values(this.state.devices)}
                 renderItem={({ item }) => (
 
-                  <Text style={styles.item} onPress={() => this.connectToDevice(item.macAddress)}>{item.name}</Text>
+                  <Text style={styles.item} onPress={() => this.connectToDevice(item.index)}>{item.name}</Text>
                 )}
-                keyExtractor={(item) => item.macAddress}
+                keyExtractor={(item) => item.id}
               />
             )}
           </>
