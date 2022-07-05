@@ -14,6 +14,7 @@ RCT_EXPORT_MODULE(BoltSDK)
     if (self = [super init]) {
         self.isConnecting = false;
         [BMSAPI instance].enableLogging = true;
+        self.swiper = [[BMSSwiperController alloc] initWithDelegate:self swiper:BMSSwiperTypeVP3300 loggingEnabled:YES];
     }
     return self;
 }
