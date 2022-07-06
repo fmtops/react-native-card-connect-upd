@@ -62,6 +62,16 @@ RCT_EXPORT_METHOD(activateDevice) {
     }
 }
 
+RCT_EXPORT_METHOD(setCardReadTimeout:(NSInteger *)timeoutValue) {
+
+    self.swiper.cardReadTimeout = timeoutValue;
+}
+
+RCT_EXPORT_METHOD(cancelTransaction) {
+
+    [self.swiper cancelTransaction];
+}
+
 RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
 
     [self sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"in display connectToDevice: start"}];
