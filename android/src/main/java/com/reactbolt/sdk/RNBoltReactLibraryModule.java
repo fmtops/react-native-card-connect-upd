@@ -62,6 +62,12 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
             .emit(eventName, params);
     }
 
+    // @ReactMethod
+    // public void setCardReadTimeout(int timeoutValue) {
+
+    //     final SwiperControllerManager swipManager = SwiperControllerManager.getInstance();        
+    // }
+
     @ReactMethod
     public void activateDevice() {
         final SwiperControllerManager swipManager = SwiperControllerManager.getInstance();
@@ -85,7 +91,7 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
                 Log.d(TAG, "onTokenGenerated");
 
                 if (error == null) {
-                    Log.d(TAG, "Token Generated");
+                    Log.d(TAG, "Token Generated yessir!");
 
                     WritableMap params = Arguments.createMap();
 
@@ -94,7 +100,7 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
 
                     sendEvent("BoltOnTokenGenerated", params);
                 } else {
-                    Log.d(TAG, error.getResponseMessage());
+                    Log.d(TAG, "error is not null while generating token: " + error.getResponseMessage());
 
                     WritableMap params = Arguments.createMap();
 
@@ -107,7 +113,7 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
 
             @Override
             public void onError(SwiperError swipeError) {
-                Log.d(TAG, swipeError.toString());
+                Log.d(TAG, "On swipe error: " + swipeError.toString());
 
                 WritableMap params = Arguments.createMap();
                 params.putString("error", swipeError.toString());
@@ -149,11 +155,12 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
 
             @Override
             public void onLogUpdate(String strLogUpdate) {
-                Log.d(TAG, strLogUpdate);
+                Log.d(TAG, "Log Update: " + strLogUpdate);
 
                 WritableMap params = Arguments.createMap();
-                params.putString("log", strLogUpdate);
-                sendEvent("BoltOnLogUpdate", params);
+                params.putString("message", strLogUpdate);
+                // sendEvent("BoltOnLogUpdate", params);
+                sendEvent("BoltOnDeviceMessage", params);
             }
 
             @Override

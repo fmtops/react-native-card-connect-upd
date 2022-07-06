@@ -76,7 +76,6 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
 
     [self sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"in display connectToDevice: start"}];
 
-    // TODO: stop searching
     if (_swiper.connectionState == BMSSwiperConnectionStateSearching) {
         [self sendEventWithName:@"BoltOnLogUpdate" body:@{@"test": @"in display connectToDevice: before cancel"}];
         [_swiper cancelFindDevices];
