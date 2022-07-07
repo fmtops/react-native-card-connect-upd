@@ -44,6 +44,7 @@ export default class App extends Component {
   componentDidMount() {
 
     BoltSDK.setupConsumerApiEndpoint(SITE_URL);
+    BoltSDK.setDebugging(true);
 
     this.eventEmitter = new NativeEventEmitter(NativeModules.BoltSDK);
 
