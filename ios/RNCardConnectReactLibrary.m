@@ -31,7 +31,6 @@ RCT_EXPORT_METHOD(setupConsumerApiEndpoint:(NSString *)endpoint) {
 
 RCT_EXPORT_METHOD(setDebugging:(BOOL)shouldDebug) {
 
-    // [BMSAPI instance].endpoint = endpoint;
     self.enableDebugging = shouldDebug;
     [BMSAPI instance].enableLogging = shouldDebug;
 }
