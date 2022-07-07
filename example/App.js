@@ -276,7 +276,7 @@ export default class App extends Component {
                 data={Object.values(this.state.devices)}
                 renderItem={({ item }) => (
 
-                  <Text style={styles.item} onPress={() => this.connectToDevice(item.index)}>{item.name}</Text>
+                  <Text style={styles.item} onPress={() => this.connectToDevice(item.id)}>{item.name}</Text>
                 )}
                 keyExtractor={(item) => item.id}
               />
