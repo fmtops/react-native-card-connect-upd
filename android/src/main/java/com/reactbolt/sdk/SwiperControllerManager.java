@@ -32,7 +32,6 @@ public class SwiperControllerManager {
     }
 
     private SwiperControllerManager() {
-        Log.d(TAG, "SwiperControllerManager: constructor");
     }
 
     public void setContext(Context context) {
@@ -87,21 +86,16 @@ public class SwiperControllerManager {
             return;
         }
 
-        Log.d(TAG, "connecting to device");
-
         if (mSwiperController != null) {
-            Log.d(TAG, "disconnecting from device");
             disconnectFromDevice();
 
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d(TAG, "creating swiper controller after delay");
                     createSwiperController();
                 }
             }, 5000);
         } else {
-            Log.d(TAG, "creating swiper controller");
             createSwiperController();
         }
     }
@@ -136,12 +130,6 @@ public class SwiperControllerManager {
 
             @Override
             public void onSwiperConnected() {
-                if (bConnected) {
-                    Log.d(TAG, "onSwiperConnected bConnected = true");
-                }
-                else {
-                    Log.d(TAG, "onSwiperConnected bConnected = false");
-                }
                 bConnected = true;
                 if (mSwiperControllerListener != null) {
                     mSwiperControllerListener.onSwiperConnected();
@@ -182,7 +170,6 @@ public class SwiperControllerManager {
                 if (mSwiperControllerListener != null) {
                     mSwiperControllerListener.onDeviceConfigurationUpdate(s);
                 }
-                Log.d(TAG, "onDeviceConfigurationUpdate: " + s);
             }
 
             @Override
