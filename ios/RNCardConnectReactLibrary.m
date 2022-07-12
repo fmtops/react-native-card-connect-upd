@@ -189,7 +189,11 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
 
 - (void)swiper:(BMSSwiper *)swiper didGenerateTokenWithAccount:(BMSAccount *)account completion:(void (^)(void))completion {
 
-    [self sendEventWithName:@"BoltOnTokenGenerated" body:@{@"token": account.token}];
+    [self sendEventWithName:@"BoltOnTokenGenerated" body:@{
+        @"token": account.token,
+        @"expiry": account.expirationDate,
+        @"name": account.name
+    }];
 
     // store the completion block, so we can reactivate the device when needed
     self.restartReaderBlock = completion;
