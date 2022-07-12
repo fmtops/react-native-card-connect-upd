@@ -190,7 +190,7 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
 - (void)swiper:(BMSSwiper *)swiper didGenerateTokenWithAccount:(BMSAccount *)account completion:(void (^)(void))completion {
 
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    [formatter setDateFormat:@"mmyy"];
+    [formatter setDateFormat:@"MMyy"];
 
     //Optionally for time zone conversions
     // [formatter setTimeZone:[NSTimeZone timeZoneWithName:@"..."]];
