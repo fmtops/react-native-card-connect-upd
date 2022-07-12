@@ -189,9 +189,17 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
 
 - (void)swiper:(BMSSwiper *)swiper didGenerateTokenWithAccount:(BMSAccount *)account completion:(void (^)(void))completion {
 
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"mmyy"];
+
+    //Optionally for time zone conversions
+    // [formatter setTimeZone:[NSTimeZone timeZoneWithName:@"..."]];
+
+    NSString *stringFromDate = [formatter stringFromDate:account.expirationDate];
+
     [self sendEventWithName:@"BoltOnTokenGenerated" body:@{
         @"token": account.token,
-        @"expiry": account.expirationDate,
+        @"expiry": stringFromDate,
         @"name": account.name
     }];
 
