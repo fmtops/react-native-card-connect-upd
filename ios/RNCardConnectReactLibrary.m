@@ -134,7 +134,7 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
     NSUUID *converted = [[NSUUID alloc] initWithUUIDString:uuid];
 
     [self debug:@"in display connectToDevice: before connect"];
-    [_swiper connectToDevice:converted mode:BMSCardReadModeSwipeDipTap forceConfig:true];
+    [_swiper connectToDevice:converted mode:BMSCardReadModeSwipeDipTap];
 
     self.isConnecting = true;
 }

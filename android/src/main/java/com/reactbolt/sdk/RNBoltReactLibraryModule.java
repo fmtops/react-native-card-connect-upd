@@ -79,8 +79,10 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void activateDevice() {
 
+        debug("activating device");
         final SwiperControllerManager swipManager = SwiperControllerManager.getInstance();
         ((CCSwiperController) swipManager.getSwiperController()).startReaders(swipManager.getSwiperCaptureMode());
+        debug("after device");
     }
 
     @ReactMethod
@@ -99,9 +101,15 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
             public void onTokenGenerated(CCConsumerAccount account, CCConsumerError error) {
 
                 if (error == null) {
-                    debug("Token Generated");
+                    debug("Token Generated...???");
+                    debug("this is a ... test");
+                    debug(account.getToken());
+                    debug(account.getName());
+                    debug(account.getExpirationDate());
 
                     WritableMap params = Arguments.createMap();
+
+                    debug("On token generated: " + account.getToken());
 
                     params.putString("token", account.getToken());
                     params.putString("name", account.getName());
@@ -255,7 +263,7 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
             }
         };
 
-        api.startBluetoothDeviceSearch(mBluetoothSearchResponseListener, context, false);
+        api.startBluetoothDeviceSearch(mBluetoothSearchResponseListener, context, true);
     }
 
     @ReactMethod
