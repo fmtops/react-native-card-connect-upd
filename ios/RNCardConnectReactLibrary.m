@@ -35,6 +35,49 @@ RCT_EXPORT_METHOD(setDebugging:(BOOL)shouldDebug) {
     [BMSAPI instance].enableLogging = shouldDebug;
 }
 
+RCT_EXPORT_METHOD(getDeviceState:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+
+    switch (self.swiper.connectionState) {
+        case BMSSwiperConnectionStateConnected:
+            resolve(@{
+                @"isConnected": @true,
+                @"isActive": @false
+            });
+            break;
+        case BMSSwiperConnectionStateDisconnected:
+            resolve(@{
+                @"isConnected": @false,
+                @"isActive": @false
+            });
+            break;
+        case BMSSwiperConnectionStateConfiguring:
+            resolve(@{
+                @"isConnected": @false,
+                @"isActive": @false
+            });
+            break;
+        case BMSSwiperConnectionStateConnecting:
+            resolve(@{
+                @"isConnected": @false,
+                @"isActive": @false
+            });
+            break;
+        case BMSSwiperConnectionStateSearching:
+            resolve(@{
+                @"isConnected": @false,
+                @"isActive": @false
+            });
+            // ignore for now?
+            break;
+        default:
+            resolve(@{
+                @"isConnected": @false,
+                @"isActive": @false
+            });
+            break;
+    }
+}
+
 RCT_EXPORT_METHOD(getCardToken:(NSString *)cardNumber expirationDate:(NSString *)expirationDate CVV:(NSString *)CVV                   resolve: (RCTPromiseResolveBlock)resolve
 rejecter:(RCTPromiseRejectBlock)reject) {
 
@@ -91,7 +134,7 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
     NSUUID *converted = [[NSUUID alloc] initWithUUIDString:uuid];
 
     [self debug:@"in display connectToDevice: before connect"];
-    [_swiper connectToDevice:converted mode:BMSCardReadModeSwipeDipTap];
+    [_swiper connectToDevice:converted mode:BMSCardReadModeSwipeDipTap forceConfig:true];
 
     self.isConnecting = true;
 }
