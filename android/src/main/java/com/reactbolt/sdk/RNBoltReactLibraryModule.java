@@ -263,7 +263,7 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
             }
         };
 
-        api.startBluetoothDeviceSearch(mBluetoothSearchResponseListener, context, true);
+        api.startBluetoothDeviceSearch(mBluetoothSearchResponseListener, context, false);
     }
 
     @ReactMethod

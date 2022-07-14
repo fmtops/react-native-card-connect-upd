@@ -41,38 +41,44 @@ RCT_EXPORT_METHOD(getDeviceState:(RCTPromiseResolveBlock)resolve rejecter:(RCTPr
         case BMSSwiperConnectionStateConnected:
             resolve(@{
                 @"isConnected": @true,
-                @"isActive": @false
+                @"isActive": @false,
+                @"state": @"Connected"
             });
             break;
         case BMSSwiperConnectionStateDisconnected:
             resolve(@{
                 @"isConnected": @false,
-                @"isActive": @false
+                @"isActive": @false,
+                @"state": @"Disconnected"
             });
             break;
         case BMSSwiperConnectionStateConfiguring:
             resolve(@{
                 @"isConnected": @false,
-                @"isActive": @false
+                @"isActive": @false,
+                @"state": @"Configuring"
             });
             break;
         case BMSSwiperConnectionStateConnecting:
             resolve(@{
                 @"isConnected": @false,
-                @"isActive": @false
+                @"isActive": @false,
+                @"state": @"Connecting"
             });
             break;
         case BMSSwiperConnectionStateSearching:
             resolve(@{
                 @"isConnected": @false,
-                @"isActive": @false
+                @"isActive": @false,
+                @"state": @"Searching"
             });
             // ignore for now?
             break;
         default:
             resolve(@{
                 @"isConnected": @false,
-                @"isActive": @false
+                @"isActive": @false,
+                @"state": @"unknown"
             });
             break;
     }
