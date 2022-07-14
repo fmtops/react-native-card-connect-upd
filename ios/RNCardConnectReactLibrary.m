@@ -277,6 +277,31 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
     // this error will get issued repeatedly while connecting, ignore
     if (self.isConnecting && [error.localizedDescription isEqualToString:@"Failed to connect to device."]) {
         [self debug:@"didFailWithError: ignoring"];
+        [self debug:error.localizedDescription];
+        if (error.code) {
+            NSString* errorCode = [NSString stringWithFormat:@"%i", error.code];
+            [self debug:errorCode];
+        }
+        else {
+            [self debug:@"No error code"];
+        }
+        if (error.domain) {
+            [self debug:error.domain];
+        }
+        else {
+            [self debug:@"No error domain"];
+        }
+        if (error.userInfo) {
+            [self debug:@"user info array"];
+            for(id key in error.userInfo) {
+                NSString* userInfoString = [error.userInfo objectForKey:key];
+                [self debug:userInfoString];
+            }
+        }
+        else {
+            [self debug:@"No user info array"];
+        }
+        
         return;
     }
 
@@ -304,6 +329,7 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
     BMSDevice *device = [devices objectAtIndex:0];
     NSString *uuid = [device.uuid UUIDString];
 
+    [self debug:@"found device"];
     [self sendEventWithName:@"BoltDeviceFound" body:@{@"id": uuid, @"name": device.name}];
 }
 
