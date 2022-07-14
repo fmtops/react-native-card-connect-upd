@@ -104,6 +104,19 @@ rejecter:(RCTPromiseRejectBlock)reject) {
 
 RCT_EXPORT_METHOD(discoverDevice) {
 
+    [self debug:@"in discoverDevice: before checking state"];
+
+    if (_swiper.connectionState == BMSSwiperConnectionStateSearching) {
+        [self debug:@"in discoverDevice: before cancelFindDevices"];
+        [_swiper cancelFindDevices];
+        [self debug:@"in discoverDevice: after cancelFindDevices"];
+    }
+    else if (_swiper.connectionState == BMSSwiperConnectionStateConnecting) {
+        [self debug:@"in discoverDevice: before releaseDevice"];
+        [_swiper releaseDevice];
+        [self debug:@"in discoverDevice: after releaseDevice"];
+    }
+
     [self.swiper findDevices];
 }
 
