@@ -23,7 +23,7 @@ public class SwiperControllerManager {
     private SwiperController mSwiperController;
     private SwiperControllerListener mSwiperControllerListener = null;
     private SwiperCaptureMode mSwiperCaptureMode = SwiperCaptureMode.SWIPE_INSERT;
-    private SwiperType mSwiperType = SwiperType.BBPosDevice;
+    private SwiperType mSwiperType = SwiperType.IDTech;
     private Context mContext = null;
     private boolean bConnected = false;
 
