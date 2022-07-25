@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 import BoltSDK from 'react-native-card-connect';
 
-const SITE_ID = "fts-uat";
-const SITE_URL = `https://${SITE_ID}.cardconnect.com/cardconnect/rest`;
+const SITE_ID = "isv-uat";
+const SITE_URL = `${SITE_ID}.cardconnect.com`;
 
 export default class App extends Component {
 

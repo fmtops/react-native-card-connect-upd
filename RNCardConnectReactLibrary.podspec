@@ -11,9 +11,9 @@ Pod::Spec.new do |s|
   s.license      = "MIT"
   s.authors      = { "Brijesh Singh" => "brijeshsinghcs0013@gmail.com" }
   s.platforms    = { :ios => "9.0" }
-  s.source       = { :git => "https://github.com/brij-dev/react-native-card-connect.git", :tag => "#{s.version}" }
+  s.source       = { :git => "https://github.com/BigRoomStudios/react-native-card-connect.git", :tag => "#{s.version}" }
   s.source_files = "ios/*.{h,m}"
   s.requires_arc = true
   s.dependency "React"
-  s.ios.vendored_frameworks = "**/ios/CardConnectConsumerSDK.framework"
+  s.ios.vendored_frameworks = "**/ios/BoltMobileSDK.framework"
 end

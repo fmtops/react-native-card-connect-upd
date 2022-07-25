@@ -311,7 +311,7 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     private void setupConsumerApiEndpoint(String url) {
-        CCConsumer.getInstance().getApi().setEndPoint(url);
+        CCConsumer.getInstance().getApi().setEndPoint("https://" + url);
     }
 
     private Boolean checkPermission() {
