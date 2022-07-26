@@ -251,17 +251,25 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
 
 - (void)swiper:(BMSSwiper *)swiper didGenerateTokenWithAccount:(BMSAccount *)account completion:(void (^)(void))completion {
 
+    [self debug:@"did generate token with account.  Before creating a formatter"];
+    [self debug:account.token];
+
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [self debug:@"after creating a formatter"];
     [formatter setDateFormat:@"MMyy"];
+
+    [self debug:@"after setDateFormat"];
 
     //Optionally for time zone conversions
     // [formatter setTimeZone:[NSTimeZone timeZoneWithName:@"..."]];
 
+    [self debug:@"before creating string from formatter"];
     NSString *stringFromDate = [formatter stringFromDate:account.expirationDate];
 
+    [self debug:@"after creating string from formatter"];
     [self sendEventWithName:@"BoltOnTokenGenerated" body:@{
         @"token": account.token,
-        @"expiry": stringFromDate,
+        // @"expiry": stringFromDate,
         @"name": account.name
     }];
 
@@ -279,7 +287,7 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
         [self debug:@"didFailWithError: ignoring"];
         [self debug:error.localizedDescription];
         if (error.code) {
-            NSString* errorCode = [NSString stringWithFormat:@"%i", error.code];
+            NSString* errorCode = [NSString stringWithFormat:@"%li", error.code];
             [self debug:errorCode];
         }
         else {
