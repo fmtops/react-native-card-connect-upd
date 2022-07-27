@@ -281,6 +281,8 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
         [formatter setDateFormat:@"MMyy"];
         NSString *stringFromDate = [formatter stringFromDate:account.expirationDate];
         [self debug:stringFromDate];
+        [self debug:@"will sending the date directly work?"];
+        [self debug:account.expirationDate];
         // [self debug:account.expirationDate];
     }
     else {
