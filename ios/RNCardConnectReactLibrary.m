@@ -268,10 +268,12 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
 
     [self debug:@"after creating string from formatter"];
     [self sendEventWithName:@"BoltOnTokenGenerated" body:@{
-        @"token": account.token,
+        @"token": account.token
         // @"expiry": stringFromDate,
-        @"name": account.name
+        // @"name": account.name
     }];
+
+    [self debug:@"sent token event"];
 
     // store the completion block, so we can reactivate the device when needed
     self.restartReaderBlock = completion;
