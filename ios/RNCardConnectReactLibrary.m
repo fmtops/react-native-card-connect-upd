@@ -254,9 +254,9 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
     [self debug:@"did generate token with account.  Before creating a formatter"];
     [self debug:account.token];
 
-    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    [self debug:@"after creating a formatter"];
-    [formatter setDateFormat:@"MMyy"];
+    // NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    // [self debug:@"after creating a formatter"];
+    // [formatter setDateFormat:@"MMyy"];
 
     [self debug:@"after setDateFormat"];
 
@@ -264,7 +264,7 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
     // [formatter setTimeZone:[NSTimeZone timeZoneWithName:@"..."]];
 
     [self debug:@"before creating string from formatter"];
-    NSString *stringFromDate = [formatter stringFromDate:account.expirationDate];
+    // NSString *stringFromDate = [formatter stringFromDate:account.expirationDate];
 
     [self debug:@"after creating string from formatter"];
     [self sendEventWithName:@"BoltOnTokenGenerated" body:@{
