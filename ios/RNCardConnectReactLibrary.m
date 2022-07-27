@@ -273,6 +273,27 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
         // @"name": account.name
     }];
 
+    if (account.expirationDate) {
+        [self debug:@"debugging expiration date"];
+
+        NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+        [self debug:@"after creating a formatter"];
+        [formatter setDateFormat:@"MMyy"];
+        NSString *stringFromDate = [formatter stringFromDate:account.expirationDate];
+        [self debug:stringFromDate];
+        // [self debug:account.expirationDate];
+    }
+    else {
+        [self debug:@"No expirationDate available"];
+    }
+
+    if (account.name) {
+        [self debug:account.name];
+    }
+    else {
+        [self debug:@"No name available"];
+    }
+
     [self debug:@"sent token event"];
 
     // store the completion block, so we can reactivate the device when needed
