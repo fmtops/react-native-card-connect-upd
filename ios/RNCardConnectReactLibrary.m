@@ -35,6 +35,7 @@ RCT_EXPORT_METHOD(setDebugging:(BOOL)shouldDebug) {
     [BMSAPI instance].enableLogging = shouldDebug;
 }
 
+// Some debugging code that may be useful in the future
 RCT_EXPORT_METHOD(getDeviceState:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
 
     switch (self.swiper.connectionState) {
@@ -104,17 +105,11 @@ rejecter:(RCTPromiseRejectBlock)reject) {
 
 RCT_EXPORT_METHOD(discoverDevice) {
 
-    [self debug:@"in discoverDevice: before checking state"];
-
     if (_swiper.connectionState == BMSSwiperConnectionStateSearching) {
-        [self debug:@"in discoverDevice: before cancelFindDevices"];
         [_swiper cancelFindDevices];
-        [self debug:@"in discoverDevice: after cancelFindDevices"];
     }
     else if (_swiper.connectionState == BMSSwiperConnectionStateConnecting) {
-        [self debug:@"in discoverDevice: before releaseDevice"];
         [_swiper releaseDevice];
-        [self debug:@"in discoverDevice: after releaseDevice"];
     }
 
     [self.swiper findDevices];
@@ -122,18 +117,11 @@ RCT_EXPORT_METHOD(discoverDevice) {
 
 RCT_EXPORT_METHOD(activateDevice) {
 
-    [self debug:@"activateDevice"];
-
     if (self.restartReaderBlock) {
         self.restartReaderBlock();
         self.restartReaderBlock = nil;
     }
 }
-
-// TODO: enable setting the timeout value
-// RCT_EXPORT_METHOD(setCardReadTimeout:(NSInteger *)timeoutValue) {
-//     self.swiper.cardReadTimeout = timeoutValue;
-// }
 
 RCT_EXPORT_METHOD(cancelTransaction) {
 
@@ -142,17 +130,12 @@ RCT_EXPORT_METHOD(cancelTransaction) {
 
 RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
 
-    [self debug:@"in display connectToDevice: start"];
-
     if (_swiper.connectionState == BMSSwiperConnectionStateSearching) {
-        [self debug:@"in display connectToDevice: before cancel"];
         [_swiper cancelFindDevices];
-        [self debug:@"in display connectToDevice: after cancel"];
     }
 
     NSUUID *converted = [[NSUUID alloc] initWithUUIDString:uuid];
 
-    [self debug:@"in display connectToDevice: before connect"];
     [_swiper connectToDevice:converted mode:BMSCardReadModeSwipeDipTap];
 
     self.isConnecting = true;
@@ -177,19 +160,16 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
 
         // device will automatically activate when connecting, so we silently cancel the transaction
         if (self.isConnecting) {
-            [self debug:@"in display message, caught during is connecting, should cancel soon"];
-
             __weak RNCardConnectReactLibrary *weakSelf = self;
 
             // This is required to give the terminal enough time to finish starting before canceling -- found in their example project
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 // cancel the transaction to complete the connecting process
                 [weakSelf.swiper cancelTransaction];
-                [self debug:@"inside dispatch_after, after cancelTransaction!!!"];
             });
         }
         else {
-            [self debug:@"in display message, swiper ready"];
+            // pass the message along
             [self sendEventWithName:@"BoltOnSwiperReady" body:@{}];
         }
     }
@@ -246,57 +226,31 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
 - (void)swiperDidStartCardRead:(BMSSwiper *)swiper {
 
     [self sendEventWithName:@"BoltOnTokenGenerationStart" body:@{}];
-    [self debug:@"swiperDidStartCardRead -- is this generating the right event? -- BoltOnTokenGenerationStart"];
 }
 
 - (void)swiper:(BMSSwiper *)swiper didGenerateTokenWithAccount:(BMSAccount *)account completion:(void (^)(void))completion {
 
-    [self debug:@"did generate token with account.  Before creating a formatter"];
-    [self debug:account.token];
-
-    // NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    // [self debug:@"after creating a formatter"];
-    // [formatter setDateFormat:@"MMyy"];
-
-    [self debug:@"after setDateFormat"];
-
-    //Optionally for time zone conversions
-    // [formatter setTimeZone:[NSTimeZone timeZoneWithName:@"..."]];
-
-    [self debug:@"before creating string from formatter"];
-    // NSString *stringFromDate = [formatter stringFromDate:account.expirationDate];
-
-    [self debug:@"after creating string from formatter"];
-    [self sendEventWithName:@"BoltOnTokenGenerated" body:@{
-        @"token": account.token
-        // @"expiry": stringFromDate,
-        // @"name": account.name
-    }];
-
-    if (account.expirationDate) {
-        [self debug:@"debugging expiration date"];
-
-        NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-        [self debug:@"after creating a formatter"];
-        [formatter setDateFormat:@"MMyy"];
-        NSString *stringFromDate = [formatter stringFromDate:account.expirationDate];
-        [self debug:stringFromDate];
-        [self debug:@"will sending the date directly work?"];
-        [self debug:account.expirationDate];
-        // [self debug:account.expirationDate];
-    }
-    else {
-        [self debug:@"No expirationDate available"];
-    }
-
     if (account.name) {
         [self debug:account.name];
+        [self sendEventWithName:@"BoltOnTokenGenerated" body:@{
+            @"token": account.token,
+            @"name": account.name
+        }];
     }
+    // NFC taps have not been providing a name
+    // TODO: how to just mutate an object to send with the event?
     else {
-        [self debug:@"No name available"];
+        [self sendEventWithName:@"BoltOnTokenGenerated" body:@{
+            @"token": account.token
+        }];
     }
 
-    [self debug:@"sent token event"];
+    // TODO: pass along the expiration date if we have it
+    // if (account.expirationDate) {
+    //     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    //     [formatter setDateFormat:@"MMyy"];
+    //     NSString *stringFromDate = [formatter stringFromDate:account.expirationDate];
+    // }
 
     // store the completion block, so we can reactivate the device when needed
     self.restartReaderBlock = completion;
@@ -309,21 +263,7 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
 
     // this error will get issued repeatedly while connecting, ignore
     if (self.isConnecting && [error.localizedDescription isEqualToString:@"Failed to connect to device."]) {
-        [self debug:@"didFailWithError: ignoring"];
-        [self debug:error.localizedDescription];
-        if (error.code) {
-            NSString* errorCode = [NSString stringWithFormat:@"%li", error.code];
-            [self debug:errorCode];
-        }
-        else {
-            [self debug:@"No error code"];
-        }
-        if (error.domain) {
-            [self debug:error.domain];
-        }
-        else {
-            [self debug:@"No error domain"];
-        }
+        // this is where the error for failing to find the serial number surfaces
         if (error.userInfo) {
             [self debug:@"user info array"];
             for(id key in error.userInfo) {
@@ -341,14 +281,12 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
     // the device will automatically activate after connecting
     // we cancel this transaction to complete the connection process
     if (self.isConnecting && [error.localizedDescription isEqualToString:@"Canceled transaction."]) {
-        [self debug:@"didFailWithError: canceled transaction -- we're connected!"];
         [self sendEventWithName:@"BoltOnSwiperConnected" body:@{}];
         self.isConnecting = false;
         return;
     }
 
     if ([error.localizedDescription isEqualToString:@"Timeout"]) {
-        [self debug:@"didFailWithError: Timeout"];
         [self sendEventWithName:@"BoltOnTimeout" body:@{}];
         self.isConnecting = false;
         return;
@@ -362,7 +300,6 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
     BMSDevice *device = [devices objectAtIndex:0];
     NSString *uuid = [device.uuid UUIDString];
 
-    [self debug:@"found device"];
     [self sendEventWithName:@"BoltDeviceFound" body:@{@"id": uuid, @"name": device.name}];
 }
 
