@@ -109,12 +109,14 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
 
                     params.putString("token", account.getToken());
 
-                    if (account.getName()) {
-                        params.putString("name", account.getName());
+                    String accountName = account.getName();
+                    if (accountName != null && !accountName.isEmpty()) {
+                        params.putString("name", accountName);
                     }
 
-                    if (account.getExpirationDate()) {
-                        params.putString("expiry", account.getExpirationDate());
+                    String expiry = account.getExpirationDate();
+                    if (expiry != null && !expiry.isEmpty()) {
+                        params.putString("expiry", expiry);
                     }
 
                     sendEvent("BoltOnTokenGenerated", params);
