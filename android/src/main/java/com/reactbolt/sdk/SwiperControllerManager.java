@@ -23,7 +23,7 @@ public class SwiperControllerManager {
     private SwiperController mSwiperController;
     private SwiperControllerListener mSwiperControllerListener = null;
     private SwiperCaptureMode mSwiperCaptureMode = SwiperCaptureMode.SWIPE_INSERT;
-    private SwiperType mSwiperType = SwiperType.BBPosDevice;
+    private SwiperType mSwiperType = SwiperType.IDTech;
     private Context mContext = null;
     private boolean bConnected = false;
 
@@ -32,7 +32,6 @@ public class SwiperControllerManager {
     }
 
     private SwiperControllerManager() {
-
     }
 
     public void setContext(Context context) {
@@ -171,7 +170,6 @@ public class SwiperControllerManager {
                 if (mSwiperControllerListener != null) {
                     mSwiperControllerListener.onDeviceConfigurationUpdate(s);
                 }
-                Log.d(TAG, "onDeviceConfigurationUpdate: " + s);
             }
 
             @Override

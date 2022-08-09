@@ -7,7 +7,14 @@
 #import <React/RCTEventEmitter.h>
 #endif
 
-@interface RNCardConnectReactLibrary : RCTEventEmitter <RCTBridgeModule>
+#import <BoltMobileSDK/BMSSwiperController.h>
+
+@interface RNCardConnectReactLibrary : RCTEventEmitter <RCTBridgeModule, BMSSwiperControllerDelegate>
+
+@property (nonatomic, strong) BMSSwiperController *swiper;
+@property (nonatomic) Boolean isConnecting;
+@property (nonatomic) Boolean enableDebugging;
+@property (nonatomic, copy) void(^restartReaderBlock)(void);
 
 @end
   
