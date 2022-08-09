@@ -46,7 +46,6 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
     private int REQUEST_PERMISSIONS = 1000;
     private static final String TAG = "BoltSDK";
     private BluetoothSearchResponseListener mBluetoothSearchResponseListener = null;
-    private Map<String, BluetoothDevice> mapDevices = Collections.synchronizedMap(new HashMap<String, BluetoothDevice>());
     ReactApplicationContext context;
     private boolean enableDebugging = false;
 
@@ -254,15 +253,12 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
             @Override
             public void onDeviceFound(BluetoothDevice device) {
 
-                synchronized (mapDevices) {
+                WritableMap params = Arguments.createMap();
 
-                    WritableMap params = Arguments.createMap();
+                params.putString("id", device.getAddress());
+                params.putString("name", device.getName());
 
-                    params.putString("id", device.getAddress());
-                    params.putString("name", device.getName());
-
-                    sendEvent("BoltDeviceFound", params);
-                }
+                sendEvent("BoltDeviceFound", params);
             }
         };
 

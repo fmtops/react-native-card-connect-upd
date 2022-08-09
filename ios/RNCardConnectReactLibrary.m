@@ -6,6 +6,10 @@
 #import <React/RCTLog.h>
 #import <React/RCTConvert.h>
 
+static NSString *const MESSAGE_CANCELLED_TRANSACTION = @"Canceled transaction.";
+static NSString *const MESSAGE_FAILED_CONNECT = @"Failed to connect to device.";
+static NSString *const MESSAGE_SWIPE_TAP_INSERT = @"PLEASE SWIPE,\nTAP, OR INSERT";
+
 @implementation RNCardConnectReactLibrary
 
 RCT_EXPORT_MODULE(BoltSDK)
@@ -156,7 +160,7 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
 - (void)swiper:(BMSSwiperController *)swiper displayMessage:(NSString *)message canCancel:(BOOL)cancelable {
 
     // special message we will convert into various events
-    if ([message isEqualToString:@"PLEASE SWIPE,\nTAP, OR INSERT"]) {
+    if ([message isEqualToString:MESSAGE_SWIPE_TAP_INSERT]) {
 
         // device will automatically activate when connecting, so we silently cancel the transaction
         if (self.isConnecting) {
@@ -262,7 +266,7 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
     self.restartReaderBlock = completion;
 
     // this error will get issued repeatedly while connecting, ignore
-    if (self.isConnecting && [error.localizedDescription isEqualToString:@"Failed to connect to device."]) {
+    if (self.isConnecting && [error.localizedDescription isEqualToString:MESSAGE_FAILED_CONNECT]) {
         // this is where the error for failing to find the serial number surfaces
         if (error.userInfo) {
             [self debug:@"user info array"];
@@ -280,7 +284,7 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *)uuid) {
 
     // the device will automatically activate after connecting
     // we cancel this transaction to complete the connection process
-    if (self.isConnecting && [error.localizedDescription isEqualToString:@"Canceled transaction."]) {
+    if (self.isConnecting && [error.localizedDescription isEqualToString:MESSAGE_CANCELLED_TRANSACTION]) {
         [self sendEventWithName:@"BoltOnSwiperConnected" body:@{}];
         self.isConnecting = false;
         return;
