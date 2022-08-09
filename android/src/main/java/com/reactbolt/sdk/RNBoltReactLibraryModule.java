@@ -35,6 +35,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
+import java.lang.Thread;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -78,8 +79,14 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void activateDevice() {
 
-        final SwiperControllerManager swipManager = SwiperControllerManager.getInstance();
-        ((CCSwiperController) swipManager.getSwiperController()).startReaders(swipManager.getSwiperCaptureMode());
+        // call start readers in it's own thread because it was blocking the UI otherwise, even when using a promise
+        new Thread(new Runnable() {
+            public void run() {
+
+                final SwiperControllerManager swipManager = SwiperControllerManager.getInstance();
+                ((CCSwiperController) swipManager.getSwiperController()).startReaders(swipManager.getSwiperCaptureMode());
+            }
+        }).start();
     }
 
     @ReactMethod
