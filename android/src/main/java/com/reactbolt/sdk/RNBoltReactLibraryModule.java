@@ -364,7 +364,12 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
         );
 
         if (currentVer >= 31 && hasPermission) {
-            hasPermission = (hasPermission && ContextCompat.checkSelfPermission(context, "android.permission.BLUETOOTH_CONNECT") == PackageManager.PERMISSION_GRANTED);
+            hasPermission = (hasPermission &&
+                ContextCompat.checkSelfPermission(context, "android.permission.BLUETOOTH") == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(context, "android.permission.BLUETOOTH_ADMIN") == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(context, "android.permission.BLUETOOTH_CONNECT") == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(context, "android.permission.BLUETOOTH_SCAN") == PackageManager.PERMISSION_GRANTED
+            );
         }
 
         return hasPermission;
@@ -385,7 +390,10 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
         if (currentVer >= 31) {
             // there doesn't seem to be a constant for this (i.e. Manifest.permission.BLUETOOTH_CONNECT) -- kept getting compiler errors
             // but using the permission string directly seems to work
+            permissions.add("android.permission.BLUETOOTH");
+            permissions.add("android.permission.BLUETOOTH_ADMIN");
             permissions.add("android.permission.BLUETOOTH_CONNECT");
+            permissions.add("android.permission.BLUETOOTH_SCAN");
         }
     
         String[] array = permissions.toArray(new String[permissions.size()]);
