@@ -39,6 +39,7 @@ import java.lang.Thread;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ArrayList;
 
 import com.google.gson.Gson; 
 
@@ -256,6 +257,8 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
         }
         CCConsumerApi api = CCConsumer.getInstance().getApi();
 
+        debug("starting discovery");
+
         mBluetoothSearchResponseListener = new BluetoothSearchResponseListener() {
             @Override
             public void onDeviceFound(BluetoothDevice device) {
@@ -264,6 +267,9 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
 
                 params.putString("id", device.getAddress());
                 params.putString("name", device.getName());
+
+                debug("on device found");
+                debug(device.getName());
 
                 sendEvent("BoltDeviceFound", params);
             }
@@ -342,23 +348,56 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    private void setupConsumerApiEndpoint(String url) {
+    public void setupConsumerApiEndpoint(String url) {
 
         CCConsumer.getInstance().getApi().setEndPoint("https://" + url);
     }
 
-    private Boolean checkPermission() {
+    @ReactMethod
+    public Boolean checkPermission() {
 
-        return (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
-        PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
+        int currentVer = android.os.Build.VERSION.SDK_INT;
+
+        boolean hasPermission = (
+            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+        );
+
+        if (currentVer >= 31 && hasPermission) {
+            hasPermission = (hasPermission &&
+                ContextCompat.checkSelfPermission(context, "android.permission.BLUETOOTH") == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(context, "android.permission.BLUETOOTH_ADMIN") == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(context, "android.permission.BLUETOOTH_CONNECT") == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(context, "android.permission.BLUETOOTH_SCAN") == PackageManager.PERMISSION_GRANTED
+            );
+        }
+
+        return hasPermission;
     }
 
-    private void requestPermission() {
+    @ReactMethod
+    public void requestPermission() {
 
         final Activity activity = getCurrentActivity();
 
-        String[] permissions = { Manifest.permission.RECORD_AUDIO, Manifest.permission.ACCESS_FINE_LOCATION };
-        ActivityCompat.requestPermissions(activity, permissions, REQUEST_PERMISSIONS);
+        int currentVer = android.os.Build.VERSION.SDK_INT;
+
+        ArrayList<String> permissions = new ArrayList<String>();
+
+        permissions.add(Manifest.permission.RECORD_AUDIO);
+        permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+
+        if (currentVer >= 31) {
+            // there doesn't seem to be a constant for this (i.e. Manifest.permission.BLUETOOTH_CONNECT) -- kept getting compiler errors
+            // but using the permission string directly seems to work
+            permissions.add("android.permission.BLUETOOTH");
+            permissions.add("android.permission.BLUETOOTH_ADMIN");
+            permissions.add("android.permission.BLUETOOTH_CONNECT");
+            permissions.add("android.permission.BLUETOOTH_SCAN");
+        }
+    
+        String[] array = permissions.toArray(new String[permissions.size()]);
+
+        ActivityCompat.requestPermissions(activity, array, REQUEST_PERMISSIONS);
     }
 }
