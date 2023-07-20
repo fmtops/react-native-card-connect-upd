@@ -244,7 +244,6 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
         SwiperControllerManager.getInstance().connectToDevice();
         SwiperControllerManager.getInstance().setSwiperControllerListener(mSwiperControllerListener);
 
-        SwiperControllerManager.getInstance().getSwiperController().setDebugEnabled(enableDebugging);
     }
 
     @ReactMethod
