@@ -94,8 +94,12 @@ rejecter:(RCTPromiseRejectBlock)reject) {
 
     BMSCardInfo *card = [BMSCardInfo new];
 
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"MM/yy"];
+    NSDate *expDate = [dateFormatter dateFromString:expirationDate];
+    
     card.cardNumber = cardNumber;
-    card.expirationDate = expirationDate;
+    card.expirationDate = expDate;
     card.CVV = CVV;
 
     [[BMSAPI instance] generateAccountForCard:card completion:^(BMSAccount *account, NSError *error){
