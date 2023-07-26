@@ -6,8 +6,8 @@
   "main": "bolt_sdk.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BigRoomStudios/react-native-card-connect.git",
-    "baseUrl": "https://github.com/BigRoomStudios/react-native-card-connect"
+    "url": "git+https://github.com/fmtops/react-native-card-connect.git",
+    "baseUrl": "https://github.com/fmtops/react-native-card-connect"
   },
   "keywords": [
     "card-connect",
