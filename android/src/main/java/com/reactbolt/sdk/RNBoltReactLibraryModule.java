@@ -107,6 +107,7 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
         swipManager.setMACAddress(macAddress);
 
         SwiperControllerListener mSwiperControllerListener = new SwiperControllerListener() {
+            Boolean sendConnnectedEvent = false;
             @Override
             public void onTokenGenerated(CCConsumerAccount account, CCConsumerError error) {
 
@@ -157,8 +158,10 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
 
             @Override
             public void onSwiperConnected() {
-
-                sendEvent("BoltOnSwiperConnected", null);
+                if (!sendConnnectedEvent) {
+                    sendConnnectedEvent=true;
+                    sendEvent("BoltOnSwiperConnected", null);
+                }
             }
 
             @Override
@@ -175,7 +178,7 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
                 sendEvent("BoltOnBatteryState", params);
             }
 
-            @Override
+            @Override 
             public void onStartTokenGeneration() {
 
                 sendEvent("BoltOnTokenGenerationStart", null);
