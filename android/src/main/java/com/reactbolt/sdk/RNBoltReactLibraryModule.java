@@ -158,10 +158,10 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
 
             @Override
             public void onSwiperConnected() {
-                if(!sendConnnectedEvent) {
-                sendConnnectedEvent=true;
-                sendEvent("BoltOnSwiperConnected", null);
-                };
+                if (!sendConnnectedEvent) {
+                    sendConnnectedEvent=true;
+                    sendEvent("BoltOnSwiperConnected", null);
+                }
             }
 
             @Override
