@@ -1,5 +1,6 @@
 package com.reactbolt.sdk;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.content.pm.PackageManager;
@@ -262,6 +263,7 @@ public class RNBoltReactLibraryModule extends ReactContextBaseJavaModule {
         debug("starting discovery");
 
         mBluetoothSearchResponseListener = new BluetoothSearchResponseListener() {
+            @SuppressLint("MissingPermission")
             @Override
             public void onDeviceFound(BluetoothDevice device) {
 
