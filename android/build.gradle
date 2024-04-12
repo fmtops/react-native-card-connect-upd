@@ -47,6 +47,6 @@ dependencies {
     implementation 'com.facebook.react:react-android:0.72.10'
     implementation 'com.google.code.gson:gson:2.8.2'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    compileOnly project(":libs")
+    implementation project(":libs")
 }
   
