@@ -5,6 +5,13 @@ buildscript {
         maven {
             url = "https://jcenter.bintray.com"
         }
+        maven {
+            url = "https://artifactory.foodtrux.co/artifactory/foodtrux-lib/"
+            credentials {
+                username System.getenv("MAVEN_USERNAME")
+                password System.getenv("MAVEN_PASS")
+            }
+        }
         google()
     }
 
@@ -34,19 +41,23 @@ repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }
     maven {
+        url = "https://artifactory.foodtrux.co/artifactory/foodtrux-lib/"
+        credentials {
+            username System.getenv("MAVEN_USERNAME")
+            password System.getenv("MAVEN_PASS")
+        }
+    }
+    maven {
         url = "https://jcenter.bintray.com"
     }
     google()
-    flatDir {
-        dirs 'libs'
-    }
 }
 
 dependencies {
-//    implementation fileTree(dir: 'libs', include: ['*.aar'])
     implementation 'com.facebook.react:react-android:0.72.10'
     implementation 'com.google.code.gson:gson:2.8.2'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation project(":libs")
+    // implementation project(":libs")
+    implementation 'boltsdk:release:3.0.86@aar'
 }
   
