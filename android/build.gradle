@@ -8,8 +8,8 @@ buildscript {
         maven {
             url = "https://artifactory.foodtrux.co/artifactory/foodtrux-lib/"
             credentials {
-                username System.getenv("MAVEN_USERNAME")
-                password System.getenv("MAVEN_PASS")
+                username "iurii"
+                password "Password1"
             }
         }
         google()
@@ -43,8 +43,8 @@ repositories {
     maven {
         url = "https://artifactory.foodtrux.co/artifactory/foodtrux-lib/"
         credentials {
-            username System.getenv("MAVEN_USERNAME")
-            password System.getenv("MAVEN_PASS")
+            username "iurii"
+            password "Password1"
         }
     }
     maven {
